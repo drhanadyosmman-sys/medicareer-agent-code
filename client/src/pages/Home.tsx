@@ -8,7 +8,7 @@ import { FadeUp, SlideLeft, SlideRight, ScaleUp, AnimatedCounter, StaggerContain
 
 // Verified high-quality Unsplash images
 const IMAGES = {
-  hero: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1400&q=80', // Modern hospital corridor
+  hero: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80', // Modern glass building exterior
   doctors: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80', // Doctor smiling
   london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1400&q=80', // London skyline
   hospital: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', // Hospital building
@@ -49,17 +49,6 @@ export default function Home() {
 
         <motion.div className="container relative z-10 py-32" style={{ opacity: heroOpacity }}>
           <div className="max-w-3xl">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-8"
-            >
-              <span className="w-2.5 h-2.5 bg-teal-400 rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-teal-300">{t('home.badge')}</span>
-            </motion.div>
-
             {/* Main Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
