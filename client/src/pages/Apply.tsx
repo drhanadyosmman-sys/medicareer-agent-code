@@ -10,9 +10,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { store } from '@/lib/store';
+import { store, DocumentFile } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowRight, ArrowLeft, Upload, CheckCircle, FileText, Mic } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Upload, CheckCircle, FileText, Mic, X, Loader2 } from 'lucide-react';
 
 const STEPS = [
   { id: 1, title: 'Personal Details', desc: 'Basic information about you' },
@@ -23,12 +23,28 @@ const STEPS = [
   { id: 6, title: 'Consent', desc: 'Review and confirm' },
 ];
 
+const DOC_TYPES = [
+  { category: 'cv', label: 'CV / Resume', required: true, accept: '.pdf,.doc,.docx' },
+  { category: 'passport', label: 'Passport Copy', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'medical-degree', label: 'Medical Degree Certificate', required: true, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'internship-certificate', label: 'Internship Certificate', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'experience-certificates', label: 'Experience Certificates', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'english-test', label: 'English Test Result (IELTS/OET)', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'gmc-certificate', label: 'GMC Certificate (if available)', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'other', label: 'Other Documents', required: false, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+];
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 export default function Apply() {
   const [step, setStep] = useState(1);
   const [, navigate] = useLocation();
   const { user, register } = useAuth();
 
-  // Form state
   const [form, setForm] = useState({
     fullName: '', email: '', whatsapp: '', countryOfResidence: '', nationality: '', preferredPathway: 'uk-doctors',
     medicalSchool: '', graduationYear: '', internshipCompleted: '', yearsExperience: '', currentRole: '', specialtyInterest: '', currentCountryOfPractice: '',
@@ -37,25 +53,69 @@ export default function Apply() {
     consent1: false, consent2: false, consent3: false,
   });
 
-  const [uploadedFiles, setUploadedFiles] = useState<{category: string; name: string}[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<DocumentFile[]>([]);
+  const [uploadingCategory, setUploadingCategory] = useState<string | null>(null);
 
   const updateForm = (field: string, value: string | boolean) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = (category: string) => {
-    // Simulate file upload
+  const handleFileUpload = (category: string, accept: string) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+    input.accept = accept;
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        setUploadedFiles(prev => [...prev, { category, name: file.name }]);
-        toast.success(`${file.name} uploaded successfully`);
+      if (!file) return;
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File too large. Maximum size is 10MB.');
+        return;
       }
+
+      setUploadingCategory(category);
+      const reader = new FileReader();
+      reader.onload = (readerEvent) => {
+        const dataUrl = readerEvent.target?.result as string;
+        const fileId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+        // Store file data separately
+        store.saveFileData(fileId, dataUrl);
+
+        const docFile: DocumentFile = {
+          id: fileId,
+          name: file.name,
+          type: file.type,
+          category: category as any,
+          uploadedAt: new Date().toISOString(),
+          size: formatFileSize(file.size),
+        };
+
+        setUploadedFiles(prev => {
+          // Replace if same category already uploaded
+          const filtered = prev.filter(f => f.category !== category);
+          return [...filtered, docFile];
+        });
+        setUploadingCategory(null);
+        toast.success(`${file.name} uploaded successfully`);
+      };
+      reader.onerror = () => {
+        setUploadingCategory(null);
+        toast.error('Failed to read file. Please try again.');
+      };
+      reader.readAsDataURL(file);
     };
     input.click();
+  };
+
+  const removeFile = (category: string) => {
+    const file = uploadedFiles.find(f => f.category === category);
+    if (file) {
+      store.deleteFileData(file.id);
+      setUploadedFiles(prev => prev.filter(f => f.category !== category));
+      toast.info('File removed');
+    }
   };
 
   const handleSubmit = () => {
@@ -64,7 +124,6 @@ export default function Apply() {
       return;
     }
 
-    // Register user if not logged in
     if (!user) {
       const pwd = 'temp' + Date.now();
       register(form.fullName, form.email, pwd);
@@ -101,27 +160,28 @@ export default function Apply() {
       previousUkApplications: form.previousUkApplications === 'yes',
       previousInterviews: form.previousInterviews === 'yes',
       careerStory: form.careerStory,
-      documents: uploadedFiles.map((f, i) => ({
-        id: `doc-${Date.now()}-${i}`,
-        name: f.name,
-        type: 'application/pdf',
-        category: f.category as any,
-        uploadedAt: new Date().toISOString(),
-        size: 'N/A'
-      })),
-      messages: [],
+      documents: uploadedFiles,
+      messages: [
+        {
+          id: `msg-${Date.now()}`,
+          from: 'admin' as const,
+          content: `Thank you for submitting your application, ${form.fullName}. Our career consultant has received your profile and will begin reviewing your documents within 48 hours. We will be in touch shortly with our initial assessment.`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        }
+      ],
       adminNotes: [],
       missingDocuments: getMissingDocs(),
       recommendedSteps: getRecommendedSteps(),
     };
 
     store.addApplication(application);
-    toast.success('Application submitted successfully! Our team will review your profile within 48 hours.');
+    toast.success('Application submitted! Our team will review your profile within 48 hours.');
     navigate('/dashboard');
   };
 
   const calculateReadiness = (): number => {
-    let score = 30; // Base score for completing the form
+    let score = 30;
     if (form.gmcStatus === 'registered') score += 20;
     else if (form.gmcStatus === 'in-progress') score += 10;
     if (form.plabStatus === 'both-passed') score += 15;
@@ -155,16 +215,18 @@ export default function Apply() {
   };
 
   const nextStep = () => {
-    if (step === 1) {
-      if (!form.fullName || !form.email) {
-        toast.error('Please fill in your name and email');
-        return;
-      }
+    if (step === 1 && (!form.fullName || !form.email)) {
+      toast.error('Please fill in your name and email');
+      return;
     }
     setStep(prev => Math.min(prev + 1, 6));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+  const prevStep = () => {
+    setStep(prev => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-ivory py-8 lg:py-12">
@@ -380,37 +442,61 @@ export default function Apply() {
               <div className="space-y-5">
                 <div>
                   <h2 className="font-serif text-xl text-navy mb-1">Document Upload</h2>
-                  <p className="text-sm text-muted-foreground">Upload your certificates and documents. You can add more later from your dashboard.</p>
+                  <p className="text-sm text-muted-foreground">Upload your certificates and documents. Accepted formats: PDF, JPG, PNG, DOC. Max 10MB per file.</p>
                 </div>
                 <div className="grid gap-3">
-                  {[
-                    { category: 'cv', label: 'CV / Resume', required: true },
-                    { category: 'passport', label: 'Passport Copy', required: false },
-                    { category: 'medical-degree', label: 'Medical Degree Certificate', required: true },
-                    { category: 'internship-certificate', label: 'Internship Certificate', required: false },
-                    { category: 'experience-certificates', label: 'Experience Certificates', required: false },
-                    { category: 'english-test', label: 'English Test Result (IELTS/OET)', required: false },
-                    { category: 'gmc-certificate', label: 'GMC Certificate (if available)', required: false },
-                    { category: 'other', label: 'Other Documents', required: false },
-                  ].map(doc => {
+                  {DOC_TYPES.map(doc => {
                     const uploaded = uploadedFiles.find(f => f.category === doc.category);
+                    const isUploading = uploadingCategory === doc.category;
                     return (
-                      <div key={doc.category} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-teal/30 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-muted-foreground" />
-                          <div>
-                            <p className="text-sm font-medium">{doc.label} {doc.required && <span className="text-destructive">*</span>}</p>
-                            {uploaded && <p className="text-xs text-teal">{uploaded.name}</p>}
+                      <div key={doc.category} className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${uploaded ? 'border-teal/30 bg-teal/5' : 'border-border hover:border-teal/20'}`}>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${uploaded ? 'bg-teal/10' : 'bg-muted'}`}>
+                            {uploaded ? <CheckCircle className="w-4 h-4 text-teal" /> : <FileText className="w-4 h-4 text-muted-foreground" />}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {doc.label} {doc.required && <span className="text-destructive">*</span>}
+                            </p>
+                            {uploaded && (
+                              <p className="text-xs text-teal truncate">{uploaded.name} · {uploaded.size}</p>
+                            )}
                           </div>
                         </div>
-                        <Button variant="outline" size="sm" onClick={() => handleFileUpload(doc.category)} className="btn-press">
-                          {uploaded ? <CheckCircle className="w-4 h-4 text-teal" /> : <Upload className="w-4 h-4" />}
-                          <span className="ml-1.5">{uploaded ? 'Replace' : 'Upload'}</span>
-                        </Button>
+                        <div className="flex items-center gap-1 shrink-0 ml-2">
+                          {uploaded && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFile(doc.category)}
+                              className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
+                          <Button
+                            variant={uploaded ? 'outline' : 'default'}
+                            size="sm"
+                            disabled={isUploading}
+                            onClick={() => handleFileUpload(doc.category, doc.accept)}
+                            className={uploaded ? 'btn-press' : 'bg-navy hover:bg-navy/90 text-white btn-press'}
+                          >
+                            {isUploading ? (
+                              <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> Uploading</>
+                            ) : uploaded ? (
+                              <><Upload className="w-3.5 h-3.5 mr-1" /> Replace</>
+                            ) : (
+                              <><Upload className="w-3.5 h-3.5 mr-1" /> Upload</>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  {uploadedFiles.length} of {DOC_TYPES.length} documents uploaded. You can upload more from your dashboard after submission.
+                </p>
               </div>
             )}
 
@@ -450,13 +536,22 @@ export default function Apply() {
                     <p className="text-xs text-muted-foreground mt-2">Minimum 50 words recommended. Include your specialty interests, career goals, and why you want to work in the UK.</p>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-border rounded-xl p-8 text-center">
-                    <Mic className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm font-medium mb-1">Upload a Voice Note</p>
-                    <p className="text-xs text-muted-foreground mb-4">MP3, WAV, or M4A — up to 5 minutes</p>
-                    <Button variant="outline" onClick={() => handleFileUpload('voice-note')} className="btn-press">
-                      <Upload className="w-4 h-4 mr-2" /> Choose File
-                    </Button>
+                  <div>
+                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center">
+                      <Mic className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-sm font-medium mb-1">Upload a Voice Note</p>
+                      <p className="text-xs text-muted-foreground mb-4">MP3, WAV, or M4A — up to 5 minutes</p>
+                      {uploadedFiles.find(f => f.category === 'voice-note') ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <span className="text-sm text-teal">{uploadedFiles.find(f => f.category === 'voice-note')?.name}</span>
+                          <Button variant="ghost" size="sm" onClick={() => removeFile('voice-note')} className="text-destructive"><X className="w-4 h-4" /></Button>
+                        </div>
+                      ) : (
+                        <Button variant="outline" onClick={() => handleFileUpload('voice-note', '.mp3,.wav,.m4a,.ogg')} className="btn-press">
+                          <Upload className="w-4 h-4 mr-2" /> Choose File
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -483,6 +578,8 @@ export default function Apply() {
                     <span>{form.specialtyInterest || '—'}</span>
                     <span className="text-muted-foreground">Documents:</span>
                     <span>{uploadedFiles.length} uploaded</span>
+                    <span className="text-muted-foreground">Readiness:</span>
+                    <span className="font-medium text-navy">{calculateReadiness()}%</span>
                   </div>
                 </div>
 

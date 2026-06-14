@@ -62,6 +62,8 @@ export interface DocumentFile {
   category: 'cv' | 'passport' | 'medical-degree' | 'internship-certificate' | 'experience-certificates' | 'english-test' | 'gmc-certificate' | 'voice-note' | 'other';
   uploadedAt: string;
   size: string;
+  // Base64 data URL for actual file content (stored in localStorage)
+  dataUrl?: string;
 }
 
 export interface Message {
@@ -173,7 +175,7 @@ const initialApplications: DoctorApplication[] = [
     messages: [
       { id: 'msg-1', from: 'admin', content: 'Thank you for submitting your application, Dr. Hassan. Our career consultant has begun reviewing your profile and documents. We will be in touch shortly with our initial assessment.', createdAt: '2024-06-02T09:00:00Z', read: true },
       { id: 'msg-2', from: 'user', content: 'Thank you. I am eager to hear back. Should I upload any additional documents?', createdAt: '2024-06-03T14:00:00Z', read: true },
-      { id: 'msg-3', from: 'admin', content: 'We noticed your GMC registration is pending. Once you have your PLAB 2 date confirmed, please upload the booking confirmation. In the meantime, we are preparing your CV optimization notes.', createdAt: '2024-06-05T10:00:00Z', read: false },
+      { id: 'msg-3', from: 'admin', content: 'We noticed your GMC registration is pending. Once you have your PLAB 2 date confirmed, please upload the booking confirmation. In the meantime, we are preparing your CV optimisation notes.', createdAt: '2024-06-05T10:00:00Z', read: false },
     ],
     adminNotes: [
       { id: 'note-1', content: 'Strong candidate with good IELTS score. Needs PLAB 2 and GMC registration to be competitive. CV needs NHS-style formatting.', createdAt: '2024-06-02T09:00:00Z', type: 'general' }
@@ -184,7 +186,7 @@ const initialApplications: DoctorApplication[] = [
       'Obtain ALS certification',
       'Upload passport copy',
       'Upload internship certificate',
-      'Our team will optimize your CV for NHS applications'
+      'Our team will optimise your CV for NHS applications'
     ]
   }
 ];
@@ -208,53 +210,17 @@ const initialCountries: Country[] = [
           { id: 'faq-1', question: 'Do I need GMC registration before applying?', answer: 'Not necessarily. Some Trust-grade and Clinical Fellow positions accept doctors who are in the process of GMC registration. However, having GMC registration significantly increases your chances.' },
           { id: 'faq-2', question: 'What IELTS score do I need?', answer: 'For GMC registration, you need an overall IELTS score of 7.5 with a minimum of 7.0 in each band. OET requires a minimum of B in all four components.' },
           { id: 'faq-3', question: 'How long does the process take?', answer: 'The timeline varies depending on your readiness. If you have GMC registration and all documents ready, we can begin matching you with suitable roles within 2-4 weeks. The full process from assessment to interview typically takes 4-12 weeks.' },
-          { id: 'faq-4', question: 'Do you guarantee a job placement?', answer: 'We do not guarantee employment. We maximize your chances of being shortlisted for interviews by preparing professional, role-specific applications that match person specifications.' },
+          { id: 'faq-4', question: 'Do you guarantee a job placement?', answer: 'We do not guarantee employment. We maximise your chances of being shortlisted for interviews by preparing professional, role-specific applications that match person specifications.' },
         ]
       }
     ]
   },
-  {
-    id: 'gulf',
-    name: 'Gulf Countries',
-    flag: '🇦🇪',
-    status: 'coming-soon',
-    pathways: []
-  },
-  {
-    id: 'australia',
-    name: 'Australia',
-    flag: '🇦🇺',
-    status: 'coming-soon',
-    pathways: []
-  },
-  {
-    id: 'canada',
-    name: 'Canada',
-    flag: '🇨🇦',
-    status: 'coming-soon',
-    pathways: []
-  },
-  {
-    id: 'ireland',
-    name: 'Ireland',
-    flag: '🇮🇪',
-    status: 'coming-soon',
-    pathways: []
-  },
-  {
-    id: 'germany',
-    name: 'Germany',
-    flag: '🇩🇪',
-    status: 'coming-soon',
-    pathways: []
-  },
-  {
-    id: 'newzealand',
-    name: 'New Zealand',
-    flag: '🇳🇿',
-    status: 'coming-soon',
-    pathways: []
-  }
+  { id: 'gulf', name: 'Gulf Countries', flag: '🇦🇪', status: 'coming-soon', pathways: [] },
+  { id: 'australia', name: 'Australia', flag: '🇦🇺', status: 'coming-soon', pathways: [] },
+  { id: 'canada', name: 'Canada', flag: '🇨🇦', status: 'coming-soon', pathways: [] },
+  { id: 'ireland', name: 'Ireland', flag: '🇮🇪', status: 'coming-soon', pathways: [] },
+  { id: 'germany', name: 'Germany', flag: '🇩🇪', status: 'coming-soon', pathways: [] },
+  { id: 'newzealand', name: 'New Zealand', flag: '🇳🇿', status: 'coming-soon', pathways: [] }
 ];
 
 const initialPackages: PricingPackage[] = [
@@ -263,13 +229,7 @@ const initialPackages: PricingPackage[] = [
     name: 'CV & Readiness Review',
     price: 149,
     currency: 'GBP',
-    features: [
-      'Comprehensive CV assessment',
-      'Readiness score evaluation',
-      'Missing documents checklist',
-      'Personalised improvement recommendations',
-      'One follow-up consultation'
-    ],
+    features: ['Comprehensive CV assessment', 'Readiness score evaluation', 'Missing documents checklist', 'Personalised improvement recommendations', 'One follow-up consultation'],
     active: true,
     countryId: 'uk',
     pathwayId: 'uk-doctors'
@@ -279,15 +239,7 @@ const initialPackages: PricingPackage[] = [
     name: 'Full Application Preparation',
     price: 399,
     currency: 'GBP',
-    features: [
-      'Everything in CV & Readiness Review',
-      'NHS-style CV rewrite',
-      'Supporting information preparation',
-      'Up to 5 job applications prepared',
-      'Person specification matching',
-      'Cover letter drafting',
-      'Application submission guidance'
-    ],
+    features: ['Everything in CV & Readiness Review', 'NHS-style CV rewrite', 'Supporting information preparation', 'Up to 5 job applications prepared', 'Person specification matching', 'Cover letter drafting', 'Application submission guidance'],
     active: true,
     popular: true,
     countryId: 'uk',
@@ -298,15 +250,7 @@ const initialPackages: PricingPackage[] = [
     name: 'Interview Shortlisting Support',
     price: 699,
     currency: 'GBP',
-    features: [
-      'Everything in Full Application Preparation',
-      'Up to 15 job applications',
-      'Interview preparation pack',
-      'Mock interview questions & model answers',
-      'NHS values alignment coaching',
-      'Presentation preparation if required',
-      'Post-interview debrief'
-    ],
+    features: ['Everything in Full Application Preparation', 'Up to 15 job applications', 'Interview preparation pack', 'Mock interview questions & model answers', 'NHS values alignment coaching', 'Presentation preparation if required', 'Post-interview debrief'],
     active: true,
     countryId: 'uk',
     pathwayId: 'uk-doctors'
@@ -316,16 +260,7 @@ const initialPackages: PricingPackage[] = [
     name: 'VIP Career Agent',
     price: 1299,
     currency: 'GBP',
-    features: [
-      'Everything in Interview Shortlisting Support',
-      'Unlimited job applications',
-      'Dedicated career consultant',
-      'Priority processing',
-      'Career roadmap planning',
-      'Ongoing support for 6 months',
-      'Relocation guidance',
-      'Contract review assistance'
-    ],
+    features: ['Everything in Interview Shortlisting Support', 'Unlimited job applications', 'Dedicated career consultant', 'Priority processing', 'Career roadmap planning', 'Ongoing support for 6 months', 'Relocation guidance', 'Contract review assistance'],
     active: true,
     countryId: 'uk',
     pathwayId: 'uk-doctors'
@@ -334,6 +269,31 @@ const initialPackages: PricingPackage[] = [
 
 // Store class with localStorage persistence
 class DataStore {
+  private readonly DATA_VERSION = 'v3'; // Bump to force re-seed on breaking changes
+
+  constructor() {
+    this.ensureSeeded();
+  }
+
+  // Ensure initial data is always seeded correctly
+  private ensureSeeded(): void {
+    const version = localStorage.getItem('medicareer_data_version');
+    if (version !== this.DATA_VERSION) {
+      // Clear old data and re-seed
+      const keysToKeep = ['medicareer_currentUser'];
+      const currentUser = localStorage.getItem('medicareer_currentUser');
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('medicareer_'))
+        .forEach(k => localStorage.removeItem(k));
+      if (currentUser) localStorage.setItem('medicareer_currentUser', currentUser);
+      localStorage.setItem('medicareer_data_version', this.DATA_VERSION);
+      localStorage.setItem('medicareer_users', JSON.stringify(initialUsers));
+      localStorage.setItem('medicareer_applications', JSON.stringify(initialApplications));
+      localStorage.setItem('medicareer_countries', JSON.stringify(initialCountries));
+      localStorage.setItem('medicareer_packages', JSON.stringify(initialPackages));
+    }
+  }
+
   private getItem<T>(key: string, defaultValue: T): T {
     try {
       const stored = localStorage.getItem(`medicareer_${key}`);
@@ -454,7 +414,7 @@ class DataStore {
   }
 
   login(email: string, password: string): User | null {
-    const user = this.getUsers().find(u => u.email === email && u.password === password);
+    const user = this.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
     if (user) {
       this.setCurrentUser(user);
       return user;
@@ -479,6 +439,50 @@ class DataStore {
     this.addUser(user);
     this.setCurrentUser(user);
     return user;
+  }
+
+  // File storage - store file data URLs separately to avoid bloating application records
+  saveFileData(fileId: string, dataUrl: string): void {
+    try {
+      localStorage.setItem(`medicareer_file_${fileId}`, dataUrl);
+    } catch (e) {
+      console.warn('File storage quota exceeded, storing reference only');
+    }
+  }
+
+  getFileData(fileId: string): string | null {
+    return localStorage.getItem(`medicareer_file_${fileId}`);
+  }
+
+  deleteFileData(fileId: string): void {
+    localStorage.removeItem(`medicareer_file_${fileId}`);
+  }
+
+  // Get unread message count for a user
+  getUnreadCount(userId: string): number {
+    const app = this.getApplicationByUserId(userId);
+    if (!app) return 0;
+    return app.messages.filter(m => m.from === 'admin' && !m.read).length;
+  }
+
+  // Get total unread messages across all applications (for admin)
+  getAdminUnreadCount(): number {
+    const apps = this.getApplications();
+    return apps.reduce((total, app) => {
+      return total + app.messages.filter(m => m.from === 'user' && !m.read).length;
+    }, 0);
+  }
+
+  // Mark messages as read
+  markMessagesRead(appId: string, from: 'admin' | 'user'): void {
+    const apps = this.getApplications();
+    const idx = apps.findIndex(a => a.id === appId);
+    if (idx !== -1) {
+      apps[idx].messages = apps[idx].messages.map(m =>
+        m.from === from ? { ...m, read: true } : m
+      );
+      this.setItem('applications', apps);
+    }
   }
 }
 
