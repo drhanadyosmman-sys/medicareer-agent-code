@@ -246,7 +246,7 @@ export default function Apply() {
           </div>
           <Progress value={(step / 6) * 100} className="h-2" />
           <div className="flex justify-between mt-2">
-            {[t('apply.steps.s1'), t('apply.steps.s2'), t('apply.steps.s3'), t('apply.steps.s4'), t('apply.steps.s5'), t('apply.steps.s6')].map((title, i) => (
+            {[t('apply.step1Title'), t('apply.step2Title'), t('apply.step3Title'), t('apply.step4Title'), t('apply.step5Title'), t('apply.step6Title')].map((title, i) => (
               <div key={i} className={`text-xs hidden sm:block ${step >= i + 1 ? 'text-teal font-medium' : 'text-muted-foreground'}`}>
                 {title}
               </div>
