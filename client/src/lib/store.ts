@@ -257,8 +257,8 @@ const initialPackages: PricingPackage[] = [
   },
   {
     id: 'pkg-4',
-    name: 'VIP Career Agent',
-    price: 1299,
+      name: 'VIP Career Agent',
+      price: 1299,
     currency: 'GBP',
     features: ['Everything in Interview Shortlisting Support', 'Unlimited job applications', 'Dedicated career consultant', 'Expert resume review session (priority)', 'Priority processing', 'Career roadmap planning', 'Ongoing support for 6 months', 'Relocation guidance', 'Contract review assistance'],
     active: true,

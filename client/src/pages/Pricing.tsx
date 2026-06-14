@@ -5,6 +5,14 @@ import { CheckCircle, ArrowRight, CalendarCheck, Users, Star } from 'lucide-reac
 import { store } from '@/lib/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+// Real payment URLs mapped to package IDs
+const PAYMENT_URLS: Record<string, string> = {
+  'pkg-1': 'https://www.healthcarequalityschools.com/purchase?product_id=6771620',
+  'pkg-2': 'https://www.healthcarequalityschools.com/purchase?product_id=6771622',
+  'pkg-3': 'https://www.healthcarequalityschools.com/purchase?product_id=6771631',
+  'pkg-4': 'https://www.healthcarequalityschools.com/purchase?product_id=6771632',
+};
+
 export default function Pricing() {
   const packages = store.getPackages().filter(p => p.active);
   const { lang } = useLanguage();
@@ -81,11 +89,11 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={`/apply?plan=${pkg.id}&planName=${encodeURIComponent(pkg.name)}&price=${pkg.price}`}>
+                  <a href={PAYMENT_URLS[pkg.id] || '#'} target="_blank" rel="noopener noreferrer">
                     <Button className={`w-full btn-press ${pkg.popular ? 'bg-teal hover:bg-teal/90 text-white' : 'bg-navy hover:bg-navy/90 text-white'}`}>
                       {lang === 'ar' ? 'اختر الباقة' : 'Choose Plan'} <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
-                  </Link>
+                  </a>
                 </CardContent>
               </Card>
             ))}

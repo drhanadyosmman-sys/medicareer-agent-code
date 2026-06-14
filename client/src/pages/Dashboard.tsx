@@ -181,7 +181,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-ivory py-8">
       <div className="container max-w-6xl">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex items-start justify-between mb-6">
           <div>
           <h1 className="font-serif text-3xl text-navy mb-1">{t('dashboard.welcome')}, {application.fullName.split(' ').slice(0, 2).join(' ')}</h1>
           <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
@@ -196,6 +196,33 @@ export default function Dashboard() {
             </button>
           )}
         </div>
+
+        {/* Subscribed Plan Card */}
+        {(() => {
+          const subscribedPkg = store.getPackages().find(p => p.id === (application.preferredPathway === 'uk-nhs-jobs' ? 'pkg-2' : 'pkg-2'));
+          const planName = subscribedPkg?.name || 'Full Application Preparation';
+          const planPrice = subscribedPkg?.price || 399;
+          return (
+            <div className="mb-6 p-4 bg-gradient-to-r from-navy to-blue-800 rounded-xl flex items-center justify-between gap-4 shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/15 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-teal-300" />
+                </div>
+                <div>
+                  <div className="text-xs text-white/60 font-medium">
+                    {lang === 'ar' ? 'باقتك الحالية' : 'Your Current Plan'}
+                  </div>
+                  <div className="text-white font-semibold text-sm">
+                    {planName} <span className="text-teal-300 font-bold">— £{planPrice}</span>
+                  </div>
+                </div>
+              </div>
+              <Badge className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs">
+                {lang === 'ar' ? 'نشط' : 'Active'}
+              </Badge>
+            </div>
+          );
+        })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 bg-white border border-border shadow-sm">
