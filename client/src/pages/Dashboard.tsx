@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { store, DoctorApplication, DocumentFile } from '@/lib/store';
 import { toast } from 'sonner';
 import ChatPanel from '@/components/ChatPanel';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   CheckCircle, AlertCircle, FileText, MessageSquare, Upload, Clock,
   ArrowRight, User, ChevronRight, Download, X, Loader2, Bell
@@ -54,6 +55,7 @@ export default function Dashboard() {
   const [application, setApplication] = useState<DoctorApplication | null>(null);
   const [uploadingCategory, setUploadingCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const { t, lang } = useLanguage();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -174,8 +176,8 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="font-serif text-3xl text-navy mb-1">Welcome, {application.fullName.split(' ').slice(0, 2).join(' ')}</h1>
-            <p className="text-muted-foreground">Your application is being handled by our career consultancy team.</p>
+          <h1 className="font-serif text-3xl text-navy mb-1">{t('dashboard.welcome')}, {application.fullName.split(' ').slice(0, 2).join(' ')}</h1>
+          <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
           </div>
           {unreadCount > 0 && (
             <button
@@ -190,16 +192,16 @@ export default function Dashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 bg-white border border-border shadow-sm">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="overview">{t('dashboard.overview')}</TabsTrigger>
             <TabsTrigger value="messages" className="relative">
-              Messages
+              {t('dashboard.messages')}
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-teal text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="documents">{t('dashboard.documentsTab')}</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -209,7 +211,7 @@ export default function Dashboard() {
                 {/* Readiness Score */}
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-3">
-                    <CardTitle className="font-serif text-lg text-navy">Application Readiness Score</CardTitle>
+                    <CardTitle className="font-serif text-lg text-navy">{t('dashboard.readinessTitle')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4 mb-3">
@@ -229,7 +231,7 @@ export default function Dashboard() {
                 {/* Application Stage */}
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-3">
-                    <CardTitle className="font-serif text-lg text-navy">Application Progress</CardTitle>
+                    <CardTitle className="font-serif text-lg text-navy">{t('dashboard.progressTitle')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-1 overflow-x-auto pb-2">
@@ -250,7 +252,7 @@ export default function Dashboard() {
                       ))}
                     </div>
                     <p className="text-sm text-muted-foreground mt-3">
-                      Current stage: <strong className="text-navy">{STAGES[currentStageIdx]?.label}</strong>
+                      {t('dashboard.currentStage')}: <strong className="text-navy">{STAGES[currentStageIdx]?.label}</strong>
                     </p>
                   </CardContent>
                 </Card>

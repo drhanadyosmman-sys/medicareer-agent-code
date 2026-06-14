@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { store } from '@/lib/store';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,6 +19,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
   const [, navigate] = useLocation();
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,21 +68,21 @@ export default function Login() {
       <Card className="w-full max-w-md border-0 shadow-lg">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="font-serif text-2xl text-navy mb-2">{isRegister ? 'Create Account' : 'Welcome Back'}</h1>
+            <h1 className="font-serif text-2xl text-navy mb-2">{isRegister ? t('login.createAccount') : t('login.welcomeBack')}</h1>
             <p className="text-sm text-muted-foreground">
-              {isRegister ? 'Join MediCareer Agent to track your application' : 'Sign in to access your dashboard'}
+              {isRegister ? t('login.createAccountDesc') : t('login.signInDesc')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <div>
-                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                <Label htmlFor="name" className="text-sm font-medium">{t('login.fullName')}</Label>
                 <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Dr. John Smith" className="mt-1.5" />
               </div>
             )}
             <div>
-              <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-medium">{t('login.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -92,7 +94,7 @@ export default function Login() {
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">{t('login.password')}</Label>
               <div className="relative mt-1.5">
                 <Input
                   id="password"
@@ -113,19 +115,19 @@ export default function Login() {
               </div>
             </div>
             <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90 text-white btn-press">
-              {loading ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
+              {loading ? t('login.pleaseWait') : isRegister ? t('login.createBtn') : t('login.signInBtn')}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <button onClick={() => setIsRegister(!isRegister)} className="text-sm text-teal hover:underline">
-              {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Create one"}
+              {isRegister ? t('login.hasAccount') : t('login.noAccount')}
             </button>
           </div>
 
           {/* Demo credentials with quick-fill buttons */}
           <div className="mt-6 p-4 bg-muted/50 rounded-xl border border-border">
-            <p className="text-xs font-medium text-navy text-center mb-3">Demo Accounts — Click to fill</p>
+            <p className="text-xs font-medium text-navy text-center mb-3">{t('login.demoTitle')}</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"

@@ -1,15 +1,20 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Users, Globe, CreditCard, LayoutDashboard } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const NAV_ITEMS = [
-  { href: '/admin', label: 'Applications', icon: Users },
-  { href: '/admin/countries', label: 'Countries & Pathways', icon: Globe },
-  { href: '/admin/pricing', label: 'Pricing Manager', icon: CreditCard },
-];
+function getNavItems(t: (key: string) => string) {
+  return [
+    { href: '/admin', label: t('admin.applications'), icon: Users },
+    { href: '/admin/countries', label: t('admin.countries'), icon: Globe },
+    { href: '/admin/pricing', label: t('admin.pricingManager'), icon: CreditCard },
+  ];
+}
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
+  const { t } = useLanguage();
+  const NAV_ITEMS = getNavItems(t);
 
   return (
     <div className="flex min-h-[calc(100vh-64px)]">
@@ -18,7 +23,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <div className="p-4 border-b border-white/10">
           <div className="flex items-center gap-2">
             <LayoutDashboard className="w-5 h-5 text-teal" />
-            <span className="font-semibold text-sm">Admin Panel</span>
+            <span className="font-semibold text-sm">{t('nav.admin')}</span>
           </div>
         </div>
         <nav className="p-3 space-y-1">

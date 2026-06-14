@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { store, DocumentFile } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArrowRight, ArrowLeft, Upload, CheckCircle, FileText, Mic, X, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const STEPS = [
   { id: 1, title: 'Personal Details', desc: 'Basic information about you' },
@@ -49,9 +50,10 @@ export default function Apply() {
   const [step, setStep] = useState(1);
   const [, navigate] = useLocation();
   const { user, register } = useAuth();
+  const { t, lang } = useLanguage();
 
   const [form, setForm] = useState({
-    fullName: '', email: '', whatsapp: '', countryOfResidence: '', nationality: '', preferredPathway: 'uk-doctors',
+    fullName: '', email: '', whatsapp: '', countryOfResidence: '', nationality: '', preferredPathway: 'uk-doctors', preferredLanguage: 'en',
     medicalSchool: '', graduationYear: '', internshipCompleted: '', yearsExperience: '', currentRole: '', specialtyInterest: '', currentCountryOfPractice: '',
     gmcStatus: '', plabStatus: '', ieltsOetStatus: '', alsBlsStatus: '', nhsExperience: '', previousUkApplications: '', previousInterviews: '',
     careerStory: '', storyType: 'written',
@@ -239,14 +241,14 @@ export default function Apply() {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="font-serif text-2xl text-navy">Doctor Assessment Form</h1>
-            <span className="text-sm text-muted-foreground">Step {step} of 6</span>
+            <h1 className="font-serif text-2xl text-navy">{t('apply.title')}</h1>
+            <span className="text-sm text-muted-foreground">{t('apply.stepOf')} {step} {t('apply.of')} 6</span>
           </div>
           <Progress value={(step / 6) * 100} className="h-2" />
           <div className="flex justify-between mt-2">
-            {STEPS.map(s => (
-              <div key={s.id} className={`text-xs hidden sm:block ${step >= s.id ? 'text-teal font-medium' : 'text-muted-foreground'}`}>
-                {s.title}
+            {[t('apply.steps.s1'), t('apply.steps.s2'), t('apply.steps.s3'), t('apply.steps.s4'), t('apply.steps.s5'), t('apply.steps.s6')].map((title, i) => (
+              <div key={i} className={`text-xs hidden sm:block ${step >= i + 1 ? 'text-teal font-medium' : 'text-muted-foreground'}`}>
+                {title}
               </div>
             ))}
           </div>
@@ -258,39 +260,49 @@ export default function Apply() {
             {step === 1 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-serif text-xl text-navy mb-1">Personal Details</h2>
-                  <p className="text-sm text-muted-foreground">Tell us about yourself so we can personalise your experience.</p>
+                  <h2 className="font-serif text-xl text-navy mb-1">{t('apply.personalTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('apply.personalDesc')}</p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Full Name *</Label>
+                    <Label>{t('apply.fullName')} *</Label>
                     <Input value={form.fullName} onChange={e => updateForm('fullName', e.target.value)} placeholder="Dr. John Smith" className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Email Address *</Label>
+                    <Label>{t('apply.emailAddress')} *</Label>
                     <Input type="email" value={form.email} onChange={e => updateForm('email', e.target.value)} placeholder="doctor@example.com" className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>WhatsApp Number</Label>
+                    <Label>{t('apply.whatsapp')}</Label>
                     <Input value={form.whatsapp} onChange={e => updateForm('whatsapp', e.target.value)} placeholder="+44 7xxx xxx xxx" className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Country of Residence</Label>
-                    <Input value={form.countryOfResidence} onChange={e => updateForm('countryOfResidence', e.target.value)} placeholder="e.g. Egypt" className="mt-1.5" />
+                    <Label>{t('apply.countryOfResidence')}</Label>
+                    <Input value={form.countryOfResidence} onChange={e => updateForm('countryOfResidence', e.target.value)} placeholder={lang === 'ar' ? 'مثال: مصر' : 'e.g. Egypt'} className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Nationality</Label>
-                    <Input value={form.nationality} onChange={e => updateForm('nationality', e.target.value)} placeholder="e.g. Egyptian" className="mt-1.5" />
+                    <Label>{t('apply.nationality')}</Label>
+                    <Input value={form.nationality} onChange={e => updateForm('nationality', e.target.value)} placeholder={lang === 'ar' ? 'مثال: مصري' : 'e.g. Egyptian'} className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Preferred Country Pathway</Label>
+                    <Label>{t('apply.preferredPathway')}</Label>
                     <Select value={form.preferredPathway} onValueChange={v => updateForm('preferredPathway', v)}>
                       <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="uk-doctors">United Kingdom — Doctors</SelectItem>
-                        <SelectItem value="gulf-doctors">Gulf Countries (Coming Soon)</SelectItem>
-                        <SelectItem value="australia-doctors">Australia (Coming Soon)</SelectItem>
-                        <SelectItem value="canada-doctors">Canada (Coming Soon)</SelectItem>
+                        <SelectItem value="uk-doctors">{lang === 'ar' ? 'المملكة المتحدة — أطباء' : 'United Kingdom — Doctors'}</SelectItem>
+                        <SelectItem value="gulf-doctors">{lang === 'ar' ? 'دول الخليج (قريباً)' : 'Gulf Countries (Coming Soon)'}</SelectItem>
+                        <SelectItem value="australia-doctors">{lang === 'ar' ? 'أستراليا (قريباً)' : 'Australia (Coming Soon)'}</SelectItem>
+                        <SelectItem value="canada-doctors">{lang === 'ar' ? 'كندا (قريباً)' : 'Canada (Coming Soon)'}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>{t('apply.preferredLanguage')}</Label>
+                    <Select value={form.preferredLanguage} onValueChange={v => updateForm('preferredLanguage', v)}>
+                      <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">{t('apply.english')}</SelectItem>
+                        <SelectItem value="ar">{t('apply.arabic')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -615,16 +627,16 @@ export default function Apply() {
             <div className="flex justify-between mt-8 pt-6 border-t">
               {step > 1 ? (
                 <Button variant="outline" onClick={prevStep} className="btn-press">
-                  <ArrowLeft className="w-4 h-4 mr-2" /> Previous
+                  <ArrowLeft className="w-4 h-4 me-2" /> {t('apply.previous')}
                 </Button>
               ) : <div />}
               {step < 6 ? (
                 <Button onClick={nextStep} className="bg-navy hover:bg-navy/90 text-white btn-press">
-                  Next Step <ArrowRight className="w-4 h-4 ml-2" />
+                  {t('apply.nextStep')} <ArrowRight className="w-4 h-4 ms-2" />
                 </Button>
               ) : (
                 <Button onClick={handleSubmit} className="bg-teal hover:bg-teal/90 text-white btn-press">
-                  <CheckCircle className="w-4 h-4 mr-2" /> Submit Application
+                  <CheckCircle className="w-4 h-4 me-2" /> {t('apply.submitApplication')}
                 </Button>
               )}
             </div>

@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { store, DoctorApplication } from '@/lib/store';
 import { toast } from 'sonner';
 import ChatPanel from '@/components/ChatPanel';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Search, Filter, FileText, Download, MessageSquare, StickyNote,
   ChevronRight, User, Clock, CheckCircle, Briefcase, Wand2, Loader2
@@ -92,6 +93,7 @@ const WORKSPACE_OUTPUTS: Record<string, (app: DoctorApplication) => string> = {
 };
 
 export default function AdminApplications() {
+  const { t } = useLanguage();
   const [applications, setApplications] = useState(store.getApplications());
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStage, setFilterStage] = useState('all');
@@ -181,8 +183,8 @@ export default function AdminApplications() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-serif text-2xl text-navy">Applications</h1>
-          <p className="text-sm text-muted-foreground">{applications.length} total applicant{applications.length !== 1 ? 's' : ''}</p>
+          <h1 className="font-serif text-2xl text-navy">{t('admin.applications')}</h1>
+          <p className="text-sm text-muted-foreground">{applications.length} {t('admin.totalApplicants')}</p>
         </div>
         {totalUnread > 0 && (
           <div className="flex items-center gap-2 px-3 py-1.5 bg-teal/10 rounded-lg border border-teal/20">
@@ -196,7 +198,7 @@ export default function AdminApplications() {
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search by name, email, specialty..." className="pl-9" />
+          <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t('admin.searchPlaceholder')} className="pl-9" />
         </div>
         <Select value={filterStage} onValueChange={setFilterStage}>
           <SelectTrigger className="w-[180px]">
