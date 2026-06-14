@@ -314,52 +314,52 @@ export default function Apply() {
             {step === 2 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-serif text-xl text-navy mb-1">Medical Background</h2>
-                  <p className="text-sm text-muted-foreground">Your qualifications and clinical experience.</p>
+                  <h2 className="font-serif text-xl text-navy mb-1">{t('apply.medicalTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('apply.medicalDesc')}</p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Medical School</Label>
-                    <Input value={form.medicalSchool} onChange={e => updateForm('medicalSchool', e.target.value)} placeholder="e.g. Cairo University" className="mt-1.5" />
+                    <Label>{t('apply.medicalSchool')}</Label>
+                    <Input value={form.medicalSchool} onChange={e => updateForm('medicalSchool', e.target.value)} placeholder={lang === 'ar' ? 'مثال: جامعة القاهرة' : 'e.g. Cairo University'} className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Graduation Year</Label>
-                    <Input value={form.graduationYear} onChange={e => updateForm('graduationYear', e.target.value)} placeholder="e.g. 2018" className="mt-1.5" />
+                    <Label>{t('apply.graduationYear')}</Label>
+                    <Input value={form.graduationYear} onChange={e => updateForm('graduationYear', e.target.value)} placeholder={lang === 'ar' ? 'مثال: 2018' : 'e.g. 2018'} className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Internship Completed?</Label>
+                    <Label>{t('apply.internshipCompleted')}</Label>
                     <Select value={form.internshipCompleted} onValueChange={v => updateForm('internshipCompleted', v)}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder={lang === 'ar' ? 'اختر...' : 'Select...'} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="yes">Yes</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="yes">{t('apply.yes')}</SelectItem>
+                        <SelectItem value="no">{t('apply.no')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Years of Clinical Experience</Label>
+                    <Label>{t('apply.yearsExperience')}</Label>
                     <Select value={form.yearsExperience} onValueChange={v => updateForm('yearsExperience', v)}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder={lang === 'ar' ? 'اختر...' : 'Select...'} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0-1">Less than 1 year</SelectItem>
-                        <SelectItem value="1-2">1-2 years</SelectItem>
-                        <SelectItem value="3-5">3-5 years</SelectItem>
-                        <SelectItem value="5-10">5-10 years</SelectItem>
-                        <SelectItem value="10+">10+ years</SelectItem>
+                        <SelectItem value="0-1">{t('apply.lessThan1')}</SelectItem>
+                        <SelectItem value="1-2">{t('apply.years12')}</SelectItem>
+                        <SelectItem value="3-5">{t('apply.years35')}</SelectItem>
+                        <SelectItem value="5-10">{t('apply.years510')}</SelectItem>
+                        <SelectItem value="10+">{t('apply.years10plus')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Current Role</Label>
-                    <Input value={form.currentRole} onChange={e => updateForm('currentRole', e.target.value)} placeholder="e.g. Registrar in Internal Medicine" className="mt-1.5" />
+                    <Label>{t('apply.currentRole')}</Label>
+                    <Input value={form.currentRole} onChange={e => updateForm('currentRole', e.target.value)} placeholder={lang === 'ar' ? 'مثال: ريجسترار باطنية' : 'e.g. Registrar in Internal Medicine'} className="mt-1.5" />
                   </div>
                   <div>
-                    <Label>Specialty Interest</Label>
-                    <Input value={form.specialtyInterest} onChange={e => updateForm('specialtyInterest', e.target.value)} placeholder="e.g. Acute Internal Medicine" className="mt-1.5" />
+                    <Label>{t('apply.specialtyInterest')}</Label>
+                    <Input value={form.specialtyInterest} onChange={e => updateForm('specialtyInterest', e.target.value)} placeholder={lang === 'ar' ? 'مثال: الطب الباطني الحاد' : 'e.g. Acute Internal Medicine'} className="mt-1.5" />
                   </div>
                   <div className="md:col-span-2">
-                    <Label>Current Country of Practice</Label>
-                    <Input value={form.currentCountryOfPractice} onChange={e => updateForm('currentCountryOfPractice', e.target.value)} placeholder="e.g. Egypt" className="mt-1.5" />
+                    <Label>{t('apply.currentCountry')}</Label>
+                    <Input value={form.currentCountryOfPractice} onChange={e => updateForm('currentCountryOfPractice', e.target.value)} placeholder={lang === 'ar' ? 'مثال: مصر' : 'e.g. Egypt'} className="mt-1.5" />
                   </div>
                 </div>
               </div>
@@ -369,84 +369,84 @@ export default function Apply() {
             {step === 3 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-serif text-xl text-navy mb-1">UK Readiness</h2>
-                  <p className="text-sm text-muted-foreground">Your current registration and examination status for UK practice.</p>
+                  <h2 className="font-serif text-xl text-navy mb-1">{t('apply.ukReadyTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('apply.ukReadyDesc')}</p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label>GMC Registration Status</Label>
+                    <Label>{t('apply.gmcStatus')}</Label>
                     <Select value={form.gmcStatus} onValueChange={v => updateForm('gmcStatus', v)}>
                       <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="registered">Fully Registered</SelectItem>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="not-started">Not Started</SelectItem>
+                        <SelectItem value="registered">{t('apply.gmcRegistered')}</SelectItem>
+                        <SelectItem value="in-progress">{t('apply.gmcInProgress')}</SelectItem>
+                        <SelectItem value="not-started">{t('apply.gmcNotStarted')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>PLAB Status</Label>
+                    <Label>{t('apply.plabStatus')}</Label>
                     <Select value={form.plabStatus} onValueChange={v => updateForm('plabStatus', v)}>
                       <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="both-passed">PLAB 1 & 2 Passed</SelectItem>
-                        <SelectItem value="plab1-passed">PLAB 1 Passed Only</SelectItem>
-                        <SelectItem value="not-taken">Not Taken</SelectItem>
-                        <SelectItem value="exempt">Exempt</SelectItem>
+                        <SelectItem value="both-passed">{t('apply.plabBoth')}</SelectItem>
+                        <SelectItem value="plab1-passed">{t('apply.plab1Only')}</SelectItem>
+                        <SelectItem value="not-taken">{t('apply.plabNotTaken')}</SelectItem>
+                        <SelectItem value="exempt">{t('apply.plabExempt')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>IELTS/OET Status</Label>
+                    <Label>{t('apply.ieltsStatus')}</Label>
                     <Select value={form.ieltsOetStatus} onValueChange={v => updateForm('ieltsOetStatus', v)}>
                       <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="ielts-passed">IELTS — Passed (7.5+)</SelectItem>
-                        <SelectItem value="oet-passed">OET — Passed (B+)</SelectItem>
-                        <SelectItem value="taken-not-passed">Taken but not passed</SelectItem>
-                        <SelectItem value="not-taken">Not Taken</SelectItem>
+                        <SelectItem value="ielts-passed">{t('apply.ieltsPassed')}</SelectItem>
+                        <SelectItem value="oet-passed">{t('apply.oetPassed')}</SelectItem>
+                        <SelectItem value="taken-not-passed">{t('apply.takenNotPassed')}</SelectItem>
+                        <SelectItem value="not-taken">{t('apply.notTaken')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>ALS/BLS Status</Label>
+                    <Label>{t('apply.alsBlsStatus')}</Label>
                     <Select value={form.alsBlsStatus} onValueChange={v => updateForm('alsBlsStatus', v)}>
                       <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="als">ALS Certified</SelectItem>
-                        <SelectItem value="bls">BLS Certified</SelectItem>
-                        <SelectItem value="both">Both ALS & BLS</SelectItem>
-                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="als">{t('apply.alsCertified')}</SelectItem>
+                        <SelectItem value="bls">{t('apply.blsCertified')}</SelectItem>
+                        <SelectItem value="both">{t('apply.bothAlsBls')}</SelectItem>
+                        <SelectItem value="none">{t('apply.none')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Previous NHS Experience?</Label>
+                    <Label>{t('apply.nhsExperience')}</Label>
                     <Select value={form.nhsExperience} onValueChange={v => updateForm('nhsExperience', v)}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder={lang === 'ar' ? 'اختر...' : 'Select...'} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="yes">Yes</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="yes">{t('apply.yes')}</SelectItem>
+                        <SelectItem value="no">{t('apply.no')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Previous UK Applications?</Label>
+                    <Label>{t('apply.previousApps')}</Label>
                     <Select value={form.previousUkApplications} onValueChange={v => updateForm('previousUkApplications', v)}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder={lang === 'ar' ? 'اختر...' : 'Select...'} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="yes">Yes</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="yes">{t('apply.yes')}</SelectItem>
+                        <SelectItem value="no">{t('apply.no')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Previous Interviews?</Label>
+                    <Label>{t('apply.previousInterviews')}</Label>
                     <Select value={form.previousInterviews} onValueChange={v => updateForm('previousInterviews', v)}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder={lang === 'ar' ? 'اختر...' : 'Select...'} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="yes">Yes</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="yes">{t('apply.yes')}</SelectItem>
+                        <SelectItem value="no">{t('apply.no')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -458,8 +458,8 @@ export default function Apply() {
             {step === 4 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-serif text-xl text-navy mb-1">Document Upload</h2>
-                  <p className="text-sm text-muted-foreground">Upload your certificates and documents. Accepted formats: PDF, JPG, PNG, DOC. Max 10MB per file.</p>
+                  <h2 className="font-serif text-xl text-navy mb-1">{t('apply.docsTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('apply.docsDesc')}</p>
                 </div>
                 <div className="grid gap-3">
                   {DOC_TYPES.map(doc => {
@@ -473,7 +473,7 @@ export default function Apply() {
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-medium truncate">
-                              {doc.label} {doc.required && <span className="text-destructive">*</span>}
+                              {lang === 'ar' ? t(`apply.doc${doc.category.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase()).replace(/^([a-z])/, (_, c: string) => c.toUpperCase())}`) || doc.label : doc.label} {doc.required && <span className="text-destructive">*</span>}
                             </p>
                             {uploaded && (
                               <p className="text-xs text-teal truncate">{uploaded.name} · {uploaded.size}</p>
@@ -499,11 +499,11 @@ export default function Apply() {
                             className={uploaded ? 'btn-press' : 'bg-navy hover:bg-navy/90 text-white btn-press'}
                           >
                             {isUploading ? (
-                              <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> Uploading</>
+                              <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> {t('apply.uploading')}</>
                             ) : uploaded ? (
-                              <><Upload className="w-3.5 h-3.5 mr-1" /> Replace</>
+                              <><Upload className="w-3.5 h-3.5 mr-1" /> {t('apply.replace')}</>
                             ) : (
-                              <><Upload className="w-3.5 h-3.5 mr-1" /> Upload</>
+                              <><Upload className="w-3.5 h-3.5 mr-1" /> {t('apply.upload')}</>
                             )}
                           </Button>
                         </div>
@@ -512,7 +512,7 @@ export default function Apply() {
                   })}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {uploadedFiles.length} of {DOC_TYPES.length} documents uploaded. You can upload more from your dashboard after submission.
+                  {uploadedFiles.length} / {DOC_TYPES.length} {t('apply.docsUploaded')}
                 </p>
               </div>
             )}
@@ -521,43 +521,43 @@ export default function Apply() {
             {step === 5 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-serif text-xl text-navy mb-1">Your Career Story</h2>
-                  <p className="text-sm text-muted-foreground">Help us understand your experience and career goals. Choose one option below.</p>
+                  <h2 className="font-serif text-xl text-navy mb-1">{t('apply.storyTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('apply.storyDesc')}</p>
                 </div>
                 <RadioGroup value={form.storyType} onValueChange={v => updateForm('storyType', v)} className="grid md:grid-cols-2 gap-4">
                   <label className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${form.storyType === 'written' ? 'border-teal bg-teal/5' : 'border-border'}`}>
                     <RadioGroupItem value="written" />
                     <div>
-                      <p className="font-medium text-sm">Write Your Story</p>
-                      <p className="text-xs text-muted-foreground">Type your career story and goals</p>
+                      <p className="font-medium text-sm">{t('apply.writeStory')}</p>
+                      <p className="text-xs text-muted-foreground">{t('apply.writeStoryDesc')}</p>
                     </div>
                   </label>
                   <label className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${form.storyType === 'voice' ? 'border-teal bg-teal/5' : 'border-border'}`}>
                     <RadioGroupItem value="voice" />
                     <div>
-                      <p className="font-medium text-sm">Upload Voice Note</p>
-                      <p className="text-xs text-muted-foreground">Record or upload an audio file</p>
+                      <p className="font-medium text-sm">{t('apply.uploadVoice')}</p>
+                      <p className="text-xs text-muted-foreground">{t('apply.uploadVoiceDesc')}</p>
                     </div>
                   </label>
                 </RadioGroup>
 
                 {form.storyType === 'written' ? (
                   <div>
-                    <Label>Your Career Story & Goals</Label>
+                    <Label>{t('apply.storyLabel')}</Label>
                     <Textarea
                       value={form.careerStory}
                       onChange={e => updateForm('careerStory', e.target.value)}
-                      placeholder="Tell us about your medical career journey so far, what motivates you, and what you hope to achieve by working in the UK. The more detail you provide, the better we can support your application..."
+                      placeholder={t('apply.storyPlaceholder')}
                       className="mt-1.5 min-h-[200px]"
                     />
-                    <p className="text-xs text-muted-foreground mt-2">Minimum 50 words recommended. Include your specialty interests, career goals, and why you want to work in the UK.</p>
+                    <p className="text-xs text-muted-foreground mt-2">{t('apply.storyHint')}</p>
                   </div>
                 ) : (
                   <div>
                     <div className="border-2 border-dashed border-border rounded-xl p-8 text-center">
                       <Mic className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-sm font-medium mb-1">Upload a Voice Note</p>
-                      <p className="text-xs text-muted-foreground mb-4">MP3, WAV, or M4A — up to 5 minutes</p>
+                      <p className="text-sm font-medium mb-1">{t('apply.voiceUploadTitle')}</p>
+                      <p className="text-xs text-muted-foreground mb-4">{t('apply.voiceUploadDesc')}</p>
                       {uploadedFiles.find(f => f.category === 'voice-note') ? (
                         <div className="flex items-center justify-center gap-3">
                           <span className="text-sm text-teal">{uploadedFiles.find(f => f.category === 'voice-note')?.name}</span>
@@ -578,24 +578,24 @@ export default function Apply() {
             {step === 6 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-serif text-xl text-navy mb-1">Review & Consent</h2>
-                  <p className="text-sm text-muted-foreground">Please review and confirm the following before submitting your application.</p>
+                  <h2 className="font-serif text-xl text-navy mb-1">{t('apply.consentTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('apply.consentDesc')}</p>
                 </div>
 
                 <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                  <h3 className="font-medium text-sm text-navy">Application Summary</h3>
+                  <h3 className="font-medium text-sm text-navy">{t('apply.summary')}</h3>
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    <span className="text-muted-foreground">Name:</span>
+                    <span className="text-muted-foreground">{t('apply.summaryName')}</span>
                     <span>{form.fullName || '—'}</span>
-                    <span className="text-muted-foreground">Email:</span>
+                    <span className="text-muted-foreground">{t('apply.summaryEmail')}</span>
                     <span>{form.email || '—'}</span>
-                    <span className="text-muted-foreground">Pathway:</span>
+                    <span className="text-muted-foreground">{t('apply.summaryPathway')}</span>
                     <span>UK — Doctors</span>
-                    <span className="text-muted-foreground">Specialty:</span>
+                    <span className="text-muted-foreground">{t('apply.summarySpecialty')}</span>
                     <span>{form.specialtyInterest || '—'}</span>
-                    <span className="text-muted-foreground">Documents:</span>
-                    <span>{uploadedFiles.length} uploaded</span>
-                    <span className="text-muted-foreground">Readiness:</span>
+                    <span className="text-muted-foreground">{t('apply.summaryDocs')}</span>
+                    <span>{uploadedFiles.length} {t('apply.uploaded')}</span>
+                    <span className="text-muted-foreground">{t('apply.summaryReadiness')}</span>
                     <span className="font-medium text-navy">{calculateReadiness()}%</span>
                   </div>
                 </div>
@@ -604,25 +604,25 @@ export default function Apply() {
                   <div className="flex items-start gap-3">
                     <Checkbox id="consent1" checked={form.consent1} onCheckedChange={v => updateForm('consent1', v as boolean)} />
                     <label htmlFor="consent1" className="text-sm leading-relaxed cursor-pointer">
-                      I confirm that the information provided is accurate and complete to the best of my knowledge.
+                      {t('apply.consent1')}
                     </label>
                   </div>
                   <div className="flex items-start gap-3">
                     <Checkbox id="consent2" checked={form.consent2} onCheckedChange={v => updateForm('consent2', v as boolean)} />
                     <label htmlFor="consent2" className="text-sm leading-relaxed cursor-pointer">
-                      I understand that this service does not guarantee employment. MediCareer Agent prepares, matches, and supports my application process to maximise my chances of being shortlisted for interviews.
+                      {t('apply.consent2')}
                     </label>
                   </div>
                   <div className="flex items-start gap-3">
                     <Checkbox id="consent3" checked={form.consent3} onCheckedChange={v => updateForm('consent3', v as boolean)} />
                     <label htmlFor="consent3" className="text-sm leading-relaxed cursor-pointer">
-                      I authorise the MediCareer Agent team to review my documents and prepare application materials on my behalf.
+                      {t('apply.consent3')}
                     </label>
                   </div>
                   <div className="flex items-start gap-3">
                     <Checkbox id="consent4" checked={form.consent4} onCheckedChange={v => updateForm('consent4', v as boolean)} />
                     <label htmlFor="consent4" className="text-sm leading-relaxed cursor-pointer">
-                      I authorise MediCareer Agent to submit job applications on my behalf, including tailored CVs and cover letters, and to manage application correspondence with NHS Trusts.
+                      {t('apply.consent4')}
                     </label>
                   </div>
                 </div>
