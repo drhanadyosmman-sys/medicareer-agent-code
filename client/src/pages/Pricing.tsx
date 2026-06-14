@@ -89,8 +89,13 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                  <a href={PAYMENT_URLS[pkg.id] || '#'} target="_blank" rel="noopener noreferrer">
-                    <Button className={`w-full btn-press ${pkg.popular ? 'bg-teal hover:bg-teal/90 text-white' : 'bg-navy hover:bg-navy/90 text-white'}`}>
+                  <a
+                    href={PAYMENT_URLS[pkg.id] || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mt-auto"
+                  >
+                    <Button className="w-full py-3 text-base font-semibold bg-teal-500 hover:bg-teal-400 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95">
                       {lang === 'ar' ? 'اختر الباقة' : 'Choose Plan'} <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </a>

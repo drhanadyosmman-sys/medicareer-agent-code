@@ -269,7 +269,7 @@ const initialPackages: PricingPackage[] = [
 
 // Store class with localStorage persistence
 class DataStore {
-  private readonly DATA_VERSION = 'v4'; // Bumped: added Expert Resume Writing to packages
+  private readonly DATA_VERSION = 'v5'; // Bumped: real payment URLs, plan card in dashboard
 
   constructor() {
     this.ensureSeeded();
