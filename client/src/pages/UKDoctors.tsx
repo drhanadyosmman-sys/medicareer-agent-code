@@ -159,28 +159,86 @@ export default function UKDoctors() {
       {/* ===== REQUIREMENTS ===== */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="container">
-          <FadeUp className="max-w-3xl mx-auto mb-16 text-center">
+          <FadeUp className="max-w-3xl mx-auto mb-12 text-center">
             <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
             <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
-              {t('ukDoctors.requirementsTitle')}
+              {t('ukDoctors.reqSectionTitle')}
             </h2>
           </FadeUp>
 
-          <StaggerContainer className="max-w-2xl mx-auto space-y-4" staggerDelay={0.1}>
-            {[
-              t('ukDoctors.req1'),
-              t('ukDoctors.req2'),
-              t('ukDoctors.req3'),
-              t('ukDoctors.req4'),
-            ].map((req, i) => (
-              <StaggerItem key={i}>
-                <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-blue-50 to-white rounded-xl border border-gray-100 hover:border-teal-200 hover:shadow-md transition-all duration-300">
-                  <CheckCircle className="w-6 h-6 text-teal-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 text-lg">{req}</span>
+          {/* Shared GMC requirement */}
+          <FadeUp className="max-w-2xl mx-auto mb-10">
+            <div className="flex items-start gap-5 p-7 bg-gradient-to-r from-blue-900 to-blue-800 rounded-2xl shadow-xl">
+              <div className="w-14 h-14 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl font-bold text-white">GMC</span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle className="w-5 h-5 text-teal-400" />
+                  <h3 className="font-semibold text-white text-lg">{t('ukDoctors.reqSharedTitle')}</h3>
                 </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+                <p className="text-white/70 text-sm mt-1">{t('ukDoctors.reqSharedNote')}</p>
+              </div>
+            </div>
+          </FadeUp>
+
+          {/* Two cards side by side */}
+          <div className="max-w-3xl mx-auto grid md:grid-cols-2 gap-6">
+            {/* Service Post */}
+            <FadeUp delay={0.1}>
+              <div className="h-full rounded-2xl border-2 border-teal-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div className="bg-teal-500 px-6 py-4 flex items-center justify-between">
+                  <h3 className="font-serif text-xl font-bold text-white">{t('ukDoctors.reqServiceTitle')}</h3>
+                  <span className="bg-white text-teal-600 text-xs font-bold px-3 py-1 rounded-full">
+                    {t('ukDoctors.reqServiceBadge')}
+                  </span>
+                </div>
+                <div className="p-6 space-y-3">
+                  {[
+                    t('ukDoctors.reqServiceB1'),
+                    t('ukDoctors.reqServiceB2'),
+                    t('ukDoctors.reqServiceB3'),
+                    t('ukDoctors.reqServiceB4'),
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700 text-sm leading-relaxed">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeUp>
+
+            {/* Training Post */}
+            <FadeUp delay={0.2}>
+              <div className="h-full rounded-2xl border-2 border-blue-900/20 bg-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div className="bg-blue-900 px-6 py-4 flex items-center justify-between">
+                  <h3 className="font-serif text-xl font-bold text-white">{t('ukDoctors.reqTrainingTitle')}</h3>
+                  <span className="bg-amber-400 text-blue-900 text-xs font-bold px-3 py-1 rounded-full">
+                    {t('ukDoctors.reqTrainingBadge')}
+                  </span>
+                </div>
+                <div className="p-6">
+                  <p className="text-sm text-gray-500 mb-4 font-medium">{t('ukDoctors.reqTrainingNote')}</p>
+                  <div className="space-y-3">
+                    {[
+                      { icon: '📋', text: t('ukDoctors.reqTrainingB1') },
+                      { icon: '🎓', text: t('ukDoctors.reqTrainingB2') },
+                      { icon: '🔬', text: t('ukDoctors.reqTrainingB3') },
+                      { icon: '📝', text: t('ukDoctors.reqTrainingB4') },
+                      { icon: '💼', text: t('ukDoctors.reqTrainingB5') },
+                      { icon: '📊', text: t('ukDoctors.reqTrainingB6') },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <span className="text-base flex-shrink-0 mt-0.5">{item.icon}</span>
+                        <span className="text-gray-700 text-sm leading-relaxed">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </FadeUp>
+          </div>
         </div>
       </section>
 
