@@ -10,11 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { queueStore, JobSubmission, Subscription } from '@/lib/appQueue';
+import { reviewStore, ResumeReviewRequest } from '@/lib/resumeReview';
 import { nhsStore } from '@/lib/nhsJobs';
 import {
   Send, Clock, CheckCircle, AlertTriangle, Users, Briefcase,
   Target, Calendar, TrendingUp, Loader2, Play, FileText, Copy,
-  PenLine, XCircle, ArrowRight, RefreshCw, Zap
+  PenLine, XCircle, ArrowRight, RefreshCw, Zap, CalendarCheck
 } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -42,11 +43,13 @@ export default function AdminQueue() {
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [batchSubmitting, setBatchSubmitting] = useState(false);
   const [autoMatching, setAutoMatching] = useState(false);
+  const [reviewRequests, setReviewRequests] = useState(reviewStore.getRequests());
 
   const refresh = () => {
     setSubmissions(queueStore.getSubmissions());
     setSubscriptions(queueStore.getSubscriptions());
     setStats(queueStore.getDailyStats());
+    setReviewRequests(reviewStore.getRequests());
   };
 
   const handleSubmit = (subId: string) => {
@@ -123,6 +126,14 @@ export default function AdminQueue() {
           <TabsTrigger value="queue">Queue ({readySubmissions.length})</TabsTrigger>
           <TabsTrigger value="submitted">Submitted ({submittedSubmissions.length})</TabsTrigger>
           <TabsTrigger value="subscriptions">Packages ({subscriptions.length})</TabsTrigger>
+          <TabsTrigger value="reviews" className="relative">
+            Resume Reviews
+            {reviewRequests.filter(r => r.status === 'pending').length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-teal text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {reviewRequests.filter(r => r.status === 'pending').length}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         {/* ===== DAILY WORKFLOW TAB ===== */}
@@ -367,6 +378,52 @@ export default function AdminQueue() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </TabsContent>
+        {/* ===== RESUME REVIEW REQUESTS TAB ===== */}
+        <TabsContent value="reviews">
+          <div className="space-y-3">
+            {reviewRequests.length === 0 ? (
+              <div className="text-center py-16">
+                <CalendarCheck className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground">No resume review requests yet.</p>
+              </div>
+            ) : (
+              reviewRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(req => (
+                <Card key={req.id} className="border-0 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-navy">{req.candidateName}</span>
+                          <Badge className={`text-xs ${
+                            req.status === 'pending' ? 'bg-blue-50 text-blue-700' :
+                            req.status === 'scheduled' ? 'bg-teal/10 text-teal' :
+                            req.status === 'completed' ? 'bg-green-50 text-green-700' :
+                            'bg-red-50 text-red-700'
+                          }`}>{req.status}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-0.5">{req.specialty} · {req.email}</p>
+                        {req.message && <p className="text-xs text-muted-foreground mt-1 italic">"{req.message}"</p>}
+                        <p className="text-xs text-muted-foreground mt-1">{new Date(req.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                      </div>
+                      <Select value={req.status} onValueChange={v => {
+                        reviewStore.updateRequest(req.id, { status: v as any });
+                        refresh();
+                        toast.success(`Status updated to: ${v}`);
+                      }}>
+                        <SelectTrigger className="w-[130px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {['pending', 'scheduled', 'completed', 'cancelled'].map(s => (
+                            <SelectItem key={s} value={s} className="text-xs">{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </TabsContent>
       </Tabs>

@@ -229,7 +229,7 @@ const initialPackages: PricingPackage[] = [
     name: 'CV & Readiness Review',
     price: 149,
     currency: 'GBP',
-    features: ['Comprehensive CV assessment', 'Readiness score evaluation', 'Missing documents checklist', 'Personalised improvement recommendations', 'One follow-up consultation'],
+    features: ['Comprehensive CV assessment', 'Readiness score evaluation', 'Missing documents checklist', 'Personalised improvement recommendations', 'One follow-up consultation', 'Expert resume review session'],
     active: true,
     countryId: 'uk',
     pathwayId: 'uk-doctors'
@@ -239,7 +239,7 @@ const initialPackages: PricingPackage[] = [
     name: 'Full Application Preparation',
     price: 399,
     currency: 'GBP',
-    features: ['Everything in CV & Readiness Review', 'NHS-style CV rewrite', 'Supporting information preparation', 'Up to 5 job applications prepared', 'Person specification matching', 'Cover letter drafting', 'Application submission guidance'],
+    features: ['Everything in CV & Readiness Review', 'NHS-style CV rewrite', 'Expert resume review session', 'Supporting information preparation', 'Up to 5 job applications prepared', 'Person specification matching', 'Cover letter drafting', 'Application submission guidance'],
     active: true,
     popular: true,
     countryId: 'uk',
@@ -250,7 +250,7 @@ const initialPackages: PricingPackage[] = [
     name: 'Interview Shortlisting Support',
     price: 699,
     currency: 'GBP',
-    features: ['Everything in Full Application Preparation', 'Up to 15 job applications', 'Interview preparation pack', 'Mock interview questions & model answers', 'NHS values alignment coaching', 'Presentation preparation if required', 'Post-interview debrief'],
+    features: ['Everything in Full Application Preparation', 'Up to 15 job applications', 'Expert resume review session', 'Interview preparation pack', 'Mock interview questions & model answers', 'NHS values alignment coaching', 'Presentation preparation if required', 'Post-interview debrief'],
     active: true,
     countryId: 'uk',
     pathwayId: 'uk-doctors'
@@ -260,7 +260,7 @@ const initialPackages: PricingPackage[] = [
     name: 'VIP Career Agent',
     price: 1299,
     currency: 'GBP',
-    features: ['Everything in Interview Shortlisting Support', 'Unlimited job applications', 'Dedicated career consultant', 'Priority processing', 'Career roadmap planning', 'Ongoing support for 6 months', 'Relocation guidance', 'Contract review assistance'],
+    features: ['Everything in Interview Shortlisting Support', 'Unlimited job applications', 'Dedicated career consultant', 'Expert resume review session (priority)', 'Priority processing', 'Career roadmap planning', 'Ongoing support for 6 months', 'Relocation guidance', 'Contract review assistance'],
     active: true,
     countryId: 'uk',
     pathwayId: 'uk-doctors'
@@ -269,7 +269,7 @@ const initialPackages: PricingPackage[] = [
 
 // Store class with localStorage persistence
 class DataStore {
-  private readonly DATA_VERSION = 'v3'; // Bump to force re-seed on breaking changes
+  private readonly DATA_VERSION = 'v4'; // Bumped: added Expert Resume Writing to packages
 
   constructor() {
     this.ensureSeeded();

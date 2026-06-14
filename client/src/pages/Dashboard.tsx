@@ -14,10 +14,13 @@ import { toast } from 'sonner';
 import ChatPanel from '@/components/ChatPanel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { queueStore, JobSubmission } from '@/lib/appQueue';
+import { reviewStore, ResumeReviewRequest } from '@/lib/resumeReview';
 import {
   CheckCircle, AlertCircle, FileText, MessageSquare, Upload, Clock,
-  ArrowRight, User, ChevronRight, Download, X, Loader2, Bell
+  ArrowRight, User, ChevronRight, Download, X, Loader2, Bell, CalendarCheck
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 const STAGES = [
   { key: 'submitted', label: 'Submitted', icon: CheckCircle },
@@ -57,6 +60,9 @@ export default function Dashboard() {
   const [uploadingCategory, setUploadingCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const { t, lang } = useLanguage();
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -332,6 +338,41 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
+                {/* Expert Resume Review */}
+                <Card className="border-0 shadow-sm border-l-4 border-l-teal">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-lg bg-teal/10 flex items-center justify-center shrink-0">
+                        <CalendarCheck className="w-4 h-4 text-teal" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm text-navy">{lang === 'ar' ? 'جلسة مراجعة السيرة الذاتية' : 'Expert Resume Review Session'}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">{lang === 'ar' ? 'جلسة فردية مع مستشارنا المهني لتحسين سيرتك الذاتية لطلبات NHS' : '1-on-1 session with our career consultant to optimise your CV for NHS applications'}</p>
+                      </div>
+                    </div>
+                    {(() => {
+                      const existingReq = application ? reviewStore.getRequestsForCandidate(application.id).find(r => r.status !== 'cancelled') : null;
+                      if (existingReq) return (
+                        <div className={`text-xs px-3 py-2 rounded-lg ${
+                          existingReq.status === 'scheduled' ? 'bg-teal/10 text-teal' :
+                          existingReq.status === 'completed' ? 'bg-green-50 text-green-700' :
+                          'bg-blue-50 text-blue-700'
+                        }`}>
+                          {existingReq.status === 'pending' && (lang === 'ar' ? 'طلبك قيد المراجعة — سنتواصل معك قريباً' : 'Request received — our team will be in touch shortly')}
+                          {existingReq.status === 'scheduled' && (lang === 'ar' ? 'تم جدولة جلستك' : 'Your session has been scheduled')}
+                          {existingReq.status === 'completed' && (lang === 'ar' ? 'تمت مراجعة سيرتك الذاتية' : 'Resume review completed')}
+                        </div>
+                      );
+                      return (
+                        <Button size="sm" className="w-full bg-teal hover:bg-teal/90 text-white btn-press" onClick={() => setShowReviewModal(true)}>
+                          <CalendarCheck className="w-3.5 h-3.5 mr-1.5" />
+                          {lang === 'ar' ? 'احجز جلسة مراجعة' : 'Book Review Session'}
+                        </Button>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+
                 {/* Recommended Steps */}
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-3">
@@ -528,6 +569,75 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Resume Review Booking Modal */}
+      <Dialog open={showReviewModal} onOpenChange={setShowReviewModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-lg text-navy">
+              {lang === 'ar' ? 'احجز جلسة مراجعة السيرة الذاتية' : 'Book Expert Resume Review Session'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="p-4 bg-teal/5 rounded-xl border border-teal/10">
+              <p className="text-sm text-foreground/80 leading-relaxed">
+                {lang === 'ar'
+                  ? 'سيتواصل معك أحد مستشارينا المهنيين لجدولة جلسة مراجعة مخصصة لسيرتك الذاتية. الجلسة تستغرق حوالي 45-60 دقيقة.'
+                  : 'One of our career consultants will contact you to schedule a personalised CV review session. Sessions typically last 45-60 minutes.'}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium">
+                {lang === 'ar' ? 'ما الذي تريد مراجعته؟ (اختياري)' : 'What would you like us to focus on? (optional)'}
+              </label>
+              <Textarea
+                value={reviewMessage}
+                onChange={e => setReviewMessage(e.target.value)}
+                placeholder={lang === 'ar' ? 'مثال: تحسين قسم الخبرة السريرية، إضافة أبحاثي...' : 'e.g. Improve clinical experience section, highlight my audit work...'}
+                className="mt-1.5 min-h-[80px]"
+              />
+            </div>
+            <Button
+              className="w-full bg-teal hover:bg-teal/90 text-white btn-press"
+              disabled={reviewSubmitting}
+              onClick={() => {
+                if (!application) return;
+                setReviewSubmitting(true);
+                setTimeout(() => {
+                  const req = {
+                    id: `review-${Date.now()}`,
+                    candidateId: application.id,
+                    candidateName: application.fullName,
+                    email: application.email,
+                    specialty: application.specialtyInterest,
+                    message: reviewMessage,
+                    status: 'pending' as const,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  };
+                  reviewStore.addRequest(req);
+                  // Send confirmation message
+                  const msg = {
+                    id: `msg-${Date.now()}`,
+                    from: 'admin' as const,
+                    content: `Thank you for booking an expert resume review session, ${application.fullName.split(' ')[0]}. One of our career consultants will be in touch within 24 hours to confirm your session time. Please ensure your latest CV is uploaded to your documents section.`,
+                    createdAt: new Date().toISOString(),
+                    read: false,
+                  };
+                  store.updateApplication(application.id, { messages: [...application.messages, msg] });
+                  setApplication(prev => prev ? { ...prev, messages: [...prev.messages, msg] } : null);
+                  setReviewSubmitting(false);
+                  setShowReviewModal(false);
+                  setReviewMessage('');
+                  toast.success(lang === 'ar' ? 'تم إرسال طلبك! سنتواصل معك قريباً.' : 'Request sent! Our team will be in touch shortly.');
+                }, 800);
+              }}
+            >
+              {reviewSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {lang === 'ar' ? 'جاري الإرسال...' : 'Sending...'}</> : (lang === 'ar' ? 'إرسال الطلب' : 'Send Request')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
