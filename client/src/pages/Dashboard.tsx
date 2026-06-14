@@ -13,6 +13,7 @@ import { store, DoctorApplication, DocumentFile } from '@/lib/store';
 import { toast } from 'sonner';
 import ChatPanel from '@/components/ChatPanel';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { queueStore, JobSubmission } from '@/lib/appQueue';
 import {
   CheckCircle, AlertCircle, FileText, MessageSquare, Upload, Clock,
   ArrowRight, User, ChevronRight, Download, X, Loader2, Bell
@@ -193,6 +194,9 @@ export default function Dashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 bg-white border border-border shadow-sm">
             <TabsTrigger value="overview">{t('dashboard.overview')}</TabsTrigger>
+            <TabsTrigger value="applications">
+              {lang === 'ar' ? 'الطلبات المقدمة' : 'Applications'}
+            </TabsTrigger>
             <TabsTrigger value="messages" className="relative">
               {t('dashboard.messages')}
               {unreadCount > 0 && (
@@ -347,6 +351,64 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          </TabsContent>
+
+          {/* Applications Tab */}
+          <TabsContent value="applications">
+            <div className="max-w-3xl mx-auto space-y-6">
+              <div>
+                <h2 className="font-serif text-xl text-navy">{lang === 'ar' ? 'الطلبات المقدمة نيابة عنك' : 'Applications Submitted on Your Behalf'}</h2>
+                <p className="text-sm text-muted-foreground">{lang === 'ar' ? 'فريقنا يقدم على الوظائف المناسبة نيابة عنك' : 'Our team applies to suitable positions on your behalf'}</p>
+              </div>
+              {(() => {
+                const submissions = application ? queueStore.getSubmissionsForCandidate(application.id) : [];
+                if (submissions.length === 0) return (
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="p-8 text-center">
+                      <FileText className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">{lang === 'ar' ? 'لم يتم تقديم طلبات بعد. فريقنا يعمل على إعداد طلباتك.' : 'No applications submitted yet. Our team is preparing your applications.'}</p>
+                    </CardContent>
+                  </Card>
+                );
+                return (
+                  <div className="space-y-3">
+                    {submissions.map(sub => (
+                      <Card key={sub.id} className="border-0 shadow-sm">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-medium text-navy text-sm">{sub.jobTitle}</h4>
+                              <p className="text-xs text-muted-foreground mt-0.5">{sub.nhsTrust}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge className={`text-xs ${
+                                  sub.status === 'submitted' ? 'bg-teal/10 text-teal' :
+                                  sub.status === 'interview' ? 'bg-green-50 text-green-700' :
+                                  sub.status === 'rejected' ? 'bg-red-50 text-red-700' :
+                                  'bg-blue-50 text-blue-700'
+                                }`}>
+                                  {sub.status === 'submitted' ? (lang === 'ar' ? 'مُقدَّم' : 'Submitted') :
+                                   sub.status === 'interview' ? (lang === 'ar' ? 'مقابلة' : 'Interview') :
+                                   sub.status === 'rejected' ? (lang === 'ar' ? 'مرفوض' : 'Rejected') :
+                                   sub.status}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">{lang === 'ar' ? 'درجة التطابق' : 'Match'}: {sub.matchScore}%</span>
+                                {sub.submittedAt && <span className="text-xs text-muted-foreground">{new Date(sub.submittedAt).toLocaleDateString('en-GB')}</span>}
+                              </div>
+                            </div>
+                          </div>
+                          {sub.status === 'submitted' && sub.tailoredCv && (
+                            <details className="mt-3">
+                              <summary className="text-xs text-teal cursor-pointer hover:underline">{lang === 'ar' ? 'عرض السيرة الذاتية المستخدمة' : 'View tailored CV used'}</summary>
+                              <pre className="text-xs whitespace-pre-wrap font-sans bg-muted/30 p-3 rounded-lg border mt-2 max-h-[200px] overflow-y-auto">{sub.tailoredCv}</pre>
+                            </details>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </TabsContent>
 
