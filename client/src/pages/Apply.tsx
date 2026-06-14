@@ -630,19 +630,32 @@ export default function Apply() {
             )}
 
             {/* Navigation */}
-            <div className="flex justify-between mt-8 pt-6 border-t">
+            <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-200 gap-4">
               {step > 1 ? (
-                <Button variant="outline" onClick={prevStep} className="btn-press">
-                  <ArrowLeft className="w-4 h-4 me-2" /> {t('apply.previous')}
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
+                  className="flex items-center gap-2 px-6 py-3 h-12 text-base font-medium border-2 border-gray-300 hover:border-gray-400 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  {t('apply.previous')}
                 </Button>
               ) : <div />}
               {step < 6 ? (
-                <Button onClick={nextStep} className="bg-navy hover:bg-navy/90 text-white btn-press">
-                  {t('apply.nextStep')} <ArrowRight className="w-4 h-4 ms-2" />
+                <Button
+                  onClick={nextStep}
+                  className="flex items-center gap-2 px-8 py-3 h-12 text-base font-semibold bg-teal-500 hover:bg-teal-400 text-white rounded-xl shadow-lg shadow-teal-500/25 hover:shadow-teal-400/30 transition-all duration-200 hover:scale-105 active:scale-95 ml-auto"
+                >
+                  {t('apply.nextStep')}
+                  <ArrowRight className="w-5 h-5" />
                 </Button>
               ) : (
-                <Button onClick={handleSubmit} className="bg-teal hover:bg-teal/90 text-white btn-press">
-                  <CheckCircle className="w-4 h-4 me-2" /> {t('apply.submitApplication')}
+                <Button
+                  onClick={handleSubmit}
+                  className="flex items-center gap-2 px-8 py-3 h-12 text-base font-semibold bg-teal-500 hover:bg-teal-400 text-white rounded-xl shadow-lg shadow-teal-500/25 hover:shadow-teal-400/30 transition-all duration-200 hover:scale-105 active:scale-95 ml-auto"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  {t('apply.submitApplication')}
                 </Button>
               )}
             </div>
