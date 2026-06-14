@@ -31,6 +31,11 @@ const DOC_TYPES = [
   { category: 'experience-certificates', label: 'Experience Certificates', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
   { category: 'english-test', label: 'English Test Result (IELTS/OET)', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
   { category: 'gmc-certificate', label: 'GMC Certificate (if available)', required: false, accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'research-publications', label: 'Research Publications', required: false, accept: '.pdf,.doc,.docx' },
+  { category: 'quality-improvement', label: 'Quality Improvement Projects', required: false, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+  { category: 'leadership-evidence', label: 'Leadership Evidence', required: false, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+  { category: 'teaching-experience', label: 'Teaching Experience', required: false, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+  { category: 'clinical-audit', label: 'Clinical Audit', required: false, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
   { category: 'other', label: 'Other Documents', required: false, accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
 ];
 

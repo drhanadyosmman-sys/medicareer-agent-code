@@ -34,6 +34,11 @@ const DOC_CATEGORIES = [
   { category: 'experience-certificates', label: 'Experience Certificates', accept: '.pdf,.jpg,.jpeg,.png' },
   { category: 'english-test', label: 'English Test Result', accept: '.pdf,.jpg,.jpeg,.png' },
   { category: 'gmc-certificate', label: 'GMC Certificate', accept: '.pdf,.jpg,.jpeg,.png' },
+  { category: 'research-publications', label: 'Research Publications', accept: '.pdf,.doc,.docx' },
+  { category: 'quality-improvement', label: 'Quality Improvement Projects', accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+  { category: 'leadership-evidence', label: 'Leadership Evidence', accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+  { category: 'teaching-experience', label: 'Teaching Experience', accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
+  { category: 'clinical-audit', label: 'Clinical Audit', accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
   { category: 'other', label: 'Other Documents', accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
 ];
 

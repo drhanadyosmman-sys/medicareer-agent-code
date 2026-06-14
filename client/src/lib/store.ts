@@ -59,7 +59,7 @@ export interface DocumentFile {
   id: string;
   name: string;
   type: string;
-  category: 'cv' | 'passport' | 'medical-degree' | 'internship-certificate' | 'experience-certificates' | 'english-test' | 'gmc-certificate' | 'voice-note' | 'other';
+  category: 'cv' | 'passport' | 'medical-degree' | 'internship-certificate' | 'experience-certificates' | 'english-test' | 'gmc-certificate' | 'research-publications' | 'quality-improvement' | 'leadership-evidence' | 'teaching-experience' | 'clinical-audit' | 'voice-note' | 'other';
   uploadedAt: string;
   size: string;
   // Base64 data URL for actual file content (stored in localStorage)
