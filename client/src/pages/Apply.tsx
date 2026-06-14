@@ -183,8 +183,13 @@ export default function Apply() {
     };
 
     store.addApplication(application);
-    toast.success('Application submitted! Our team will review your profile within 48 hours.');
-    navigate('/dashboard');
+    // Redirect to checkout with plan details from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const planId = urlParams.get('plan') || 'standard';
+    const planName = urlParams.get('planName') || 'Standard Package';
+    const price = urlParams.get('price') || '299';
+    toast.success(lang === 'ar' ? 'تم إرسال الطلب! جاري التحويل للدفع...' : 'Application submitted! Redirecting to payment...');
+    setTimeout(() => navigate(`/checkout?plan=${planId}&planName=${encodeURIComponent(planName)}&price=${price}`), 1000);
   };
 
   const calculateReadiness = (): number => {

@@ -15,6 +15,7 @@ import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
+import Checkout from "./pages/Checkout";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminApplications from "./pages/admin/AdminApplications";
 import AdminCountries from "./pages/admin/AdminCountries";
@@ -45,7 +46,7 @@ function AdminRoutes() {
 function Router() {
   const [location] = useLocation();
   const isAdmin = location.startsWith('/admin');
-  const hideFooter = isAdmin || location === '/apply' || location === '/dashboard';
+  const hideFooter = isAdmin || location === '/apply' || location === '/dashboard' || location === '/checkout';
 
   return (
     <>
@@ -58,6 +59,7 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/apply" component={Apply} />
         <Route path="/dashboard" component={Dashboard} />
+        <Route path="/checkout" component={Checkout} />
         <Route path="/admin/:rest*" component={AdminRoutes} />
         <Route path="/admin" component={AdminRoutes} />
         <Route path="/404" component={NotFound} />

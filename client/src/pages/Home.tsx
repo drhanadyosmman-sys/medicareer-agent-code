@@ -92,11 +92,7 @@ export default function Home() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="/apply">
-                <Button variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm px-8 py-6 text-lg rounded-xl transition-all duration-300 hover:border-white/50">
-                  {t('home.uploadCv')}
-                </Button>
-              </Link>
+
             </motion.div>
 
             {/* Trust indicators */}

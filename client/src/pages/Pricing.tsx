@@ -81,9 +81,9 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/apply">
+                  <Link href={`/apply?plan=${pkg.id}&planName=${encodeURIComponent(pkg.name)}&price=${pkg.price}`}>
                     <Button className={`w-full btn-press ${pkg.popular ? 'bg-teal hover:bg-teal/90 text-white' : 'bg-navy hover:bg-navy/90 text-white'}`}>
-                      {lang === 'ar' ? 'ابدأ الآن' : 'Get Started'}
+                      {lang === 'ar' ? 'اختر الباقة' : 'Choose Plan'} <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </Link>
                 </CardContent>
