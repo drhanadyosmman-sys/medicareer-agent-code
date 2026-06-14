@@ -20,6 +20,28 @@ export const translations: Record<string, Record<string, Record<Language, string
     submit: { en: 'Submit', ar: 'إرسال' },
   },
 
+  // ===== NAVIGATION =====
+  nav: {
+    home: { en: 'Home', ar: 'الرئيسية' },
+    pathways: { en: 'Pathways', ar: 'المسارات' },
+    ukDoctorJobs: { en: 'UK Doctor Jobs', ar: 'وظائف بريطانيا' },
+    pricing: { en: 'Pricing', ar: 'الأسعار' },
+    signIn: { en: 'Sign In', ar: 'دخول' },
+    signOut: { en: 'Sign Out', ar: 'خروج' },
+    dashboard: { en: 'Dashboard', ar: 'لوحة التحكم' },
+    admin: { en: 'Admin Panel', ar: 'لوحة الإدارة' },
+    adminDashboard: { en: 'Admin Dashboard', ar: 'لوحة الإدارة' },
+    myDashboard: { en: 'My Dashboard', ar: 'لوحتي' },
+    startAssessment: { en: 'Start Assessment', ar: 'ابدأ التقييم' },
+  },
+
+  // ===== ADMIN =====
+  admin: {
+    applications: { en: 'Applications', ar: 'الطلبات' },
+    countries: { en: 'Countries', ar: 'الدول' },
+    pricingManager: { en: 'Pricing', ar: 'الأسعار' },
+  },
+
   // ===== HOMEPAGE =====
   home: {
     badge: { en: '🇬🇧 Building UK Medical Careers', ar: '🇬🇧 نبني مسارك المهني في بريطانيا' },
@@ -171,6 +193,8 @@ export const translations: Record<string, Record<string, Record<Language, string
     english: { en: 'English', ar: 'الإنجليزية' },
     arabic: { en: 'العربية', ar: 'العربية' },
     submitBtn: { en: 'Submit Assessment', ar: 'إرسال التقييم' },
+    previous: { en: 'Previous', ar: 'السابق' },
+    nextStep: { en: 'Next Step', ar: 'التالي' },
     successMsg: { en: 'Assessment submitted! Our team will review your profile and contact you within 48 hours.', ar: 'تم إرسال التقييم بنجاح! سيراجع فريقنا ملفك ويتواصل معك خلال 48 ساعة.' },
   },
 

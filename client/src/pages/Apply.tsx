@@ -53,11 +53,11 @@ export default function Apply() {
   const { t, lang } = useLanguage();
 
   const [form, setForm] = useState({
-    fullName: '', email: '', whatsapp: '', countryOfResidence: '', nationality: '', preferredPathway: 'uk-doctors', preferredLanguage: 'en',
+    fullName: '', email: '', whatsapp: '', countryOfResidence: '', nationality: '', preferredPathway: 'uk-nhs-jobs', preferredLanguage: 'en',
     medicalSchool: '', graduationYear: '', internshipCompleted: '', yearsExperience: '', currentRole: '', specialtyInterest: '', currentCountryOfPractice: '',
     gmcStatus: '', plabStatus: '', ieltsOetStatus: '', alsBlsStatus: '', nhsExperience: '', previousUkApplications: '', previousInterviews: '',
     careerStory: '', storyType: 'written',
-    consent1: false, consent2: false, consent3: false,
+    consent1: false, consent2: false, consent3: false, consent4: false,
   });
 
   const [uploadedFiles, setUploadedFiles] = useState<DocumentFile[]>([]);
@@ -617,6 +617,12 @@ export default function Apply() {
                     <Checkbox id="consent3" checked={form.consent3} onCheckedChange={v => updateForm('consent3', v as boolean)} />
                     <label htmlFor="consent3" className="text-sm leading-relaxed cursor-pointer">
                       I authorise the MediCareer Agent team to review my documents and prepare application materials on my behalf.
+                    </label>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox id="consent4" checked={form.consent4} onCheckedChange={v => updateForm('consent4', v as boolean)} />
+                    <label htmlFor="consent4" className="text-sm leading-relaxed cursor-pointer">
+                      I authorise MediCareer Agent to submit job applications on my behalf, including tailored CVs and cover letters, and to manage application correspondence with NHS Trusts.
                     </label>
                   </div>
                 </div>

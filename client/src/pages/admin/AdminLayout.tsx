@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Users, Globe, CreditCard, LayoutDashboard, Briefcase, Send } from 'lucide-react';
+import { Users, Globe, CreditCard, LayoutDashboard, Briefcase, Send, Database, Bell } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 function getNavItems(t: (key: string) => string) {
@@ -8,6 +8,8 @@ function getNavItems(t: (key: string) => string) {
     { href: '/admin', label: t('admin.applications'), icon: Users },
     { href: '/admin/nhs-jobs', label: 'NHS Job Matching', icon: Briefcase },
     { href: '/admin/queue', label: 'Application Queue', icon: Send },
+    { href: '/admin/job-engine', label: 'Job Collection', icon: Database },
+    { href: '/admin/follow-up', label: 'Follow-up Tracker', icon: Bell },
     { href: '/admin/countries', label: t('admin.countries'), icon: Globe },
     { href: '/admin/pricing', label: t('admin.pricingManager'), icon: CreditCard },
   ];

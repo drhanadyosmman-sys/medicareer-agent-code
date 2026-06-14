@@ -1,144 +1,208 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import { FadeUp, SlideLeft, SlideRight, StaggerContainer, StaggerItem, AnimatedCounter } from '@/components/ScrollAnimations';
+
+const IMAGES = {
+  hero: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1400&q=80', // Hospital corridor
+  doctors: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&q=80', // Doctor portrait
+  ward: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=1200&q=80', // Hospital ward
+  london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1400&q=80', // London
+};
 
 export default function UKDoctors() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <div className="min-h-screen bg-white">
       {/* ===== HERO ===== */}
-      <section className="py-16 lg:py-24 bg-gradient-to-b from-blue-900 to-blue-950 text-white">
-        <div className="container">
-          <div className="max-w-3xl animate-fade-in">
-            <div className="gold-line" />
-            <h1 className="font-serif text-4xl lg:text-5xl mb-6 leading-tight">
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        <img src={IMAGES.hero} alt="Hospital corridor" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/80 to-[#0a1628]/40" />
+        <div className="container relative z-10 py-32">
+          <FadeUp className="max-w-3xl">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
+            <h1 className="font-serif text-5xl lg:text-6xl text-white mb-6 leading-tight">
               {t('ukDoctors.title')}
             </h1>
-            <p className="text-xl text-white/80">
+            <p className="text-xl text-white/80 leading-relaxed max-w-2xl">
               {t('ukDoctors.subtitle')}
             </p>
-          </div>
+          </FadeUp>
         </div>
       </section>
 
-      {/* ===== WHO CAN APPLY ===== */}
-      <section className="py-20 lg:py-32 bg-white">
+      {/* ===== JOB TYPES ===== */}
+      <section className="py-24 lg:py-32 bg-white">
         <div className="container">
-          <div className="max-w-3xl mx-auto mb-16 animate-fade-in">
-            <div className="gold-line" />
-            <h2 className="font-serif text-4xl lg:text-5xl mb-4 text-blue-900">
+          <FadeUp className="mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
               {t('ukDoctors.eligibilityTitle')}
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 max-w-2xl">
               {t('ukDoctors.eligibilityDesc')}
             </p>
-          </div>
+          </FadeUp>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <StaggerContainer className="grid md:grid-cols-2 gap-8" staggerDelay={0.12}>
             {[
-              { title: t('ukDoctors.jobType1'), desc: t('ukDoctors.jobType1Desc'), icon: '👨‍⚕️', delay: 1 },
-              { title: t('ukDoctors.jobType2'), desc: t('ukDoctors.jobType2Desc'), icon: '🏥', delay: 2 },
-              { title: t('ukDoctors.jobType3'), desc: t('ukDoctors.jobType3Desc'), icon: '💼', delay: 3 },
-              { title: t('ukDoctors.jobType4'), desc: t('ukDoctors.jobType4Desc'), icon: '🎓', delay: 4 },
+              { title: t('ukDoctors.jobType1'), desc: t('ukDoctors.jobType1Desc'), icon: '👨‍⚕️', color: 'from-blue-500 to-blue-700' },
+              { title: t('ukDoctors.jobType2'), desc: t('ukDoctors.jobType2Desc'), icon: '🏥', color: 'from-teal-500 to-teal-700' },
+              { title: t('ukDoctors.jobType3'), desc: t('ukDoctors.jobType3Desc'), icon: '💼', color: 'from-amber-500 to-amber-700' },
+              { title: t('ukDoctors.jobType4'), desc: t('ukDoctors.jobType4Desc'), icon: '🎓', color: 'from-purple-500 to-purple-700' },
             ].map((job, i) => (
-              <Card
-                key={i}
-                className={`p-8 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-blue-50 to-white animate-stagger-${job.delay}`}
-              >
-                <div className="text-4xl mb-4">{job.icon}</div>
-                <h3 className="font-serif text-xl font-bold text-blue-900 mb-3">
-                  {job.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {job.desc}
-                </p>
-              </Card>
+              <StaggerItem key={i}>
+                <div className="group p-8 rounded-2xl bg-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${job.color} flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition-transform duration-300`}>
+                    {job.icon}
+                  </div>
+                  <h3 className="font-serif text-xl font-bold text-blue-900 mb-3">
+                    {job.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {job.desc}
+                  </p>
+                </div>
+              </StaggerItem>
             ))}
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ===== IMAGE BREAK - London ===== */}
+      <section className="relative h-[350px] overflow-hidden">
+        <img src={IMAGES.london} alt="London" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 to-transparent" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="container pb-12">
+            <FadeUp>
+              <div className="grid grid-cols-3 gap-8 max-w-lg">
+                <div className="text-center">
+                  <div className="font-serif text-3xl font-bold text-white">
+                    <AnimatedCounter target={150} suffix="+" />
+                  </div>
+                  <div className="text-white/70 text-sm mt-1">NHS Trusts</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-serif text-3xl font-bold text-white">
+                    <AnimatedCounter target={500} suffix="+" />
+                  </div>
+                  <div className="text-white/70 text-sm mt-1">{lang === 'ar' ? 'طبيب' : 'Doctors'}</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-serif text-3xl font-bold text-white">
+                    <AnimatedCounter target={92} suffix="%" />
+                  </div>
+                  <div className="text-white/70 text-sm mt-1">{lang === 'ar' ? 'نجاح' : 'Success'}</div>
+                </div>
+              </div>
+            </FadeUp>
           </div>
         </div>
       </section>
 
       {/* ===== WHAT WE DO ===== */}
-      <section className="py-20 lg:py-32 bg-gradient-to-b from-blue-50 to-white">
+      <section className="py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
         <div className="container">
-          <div className="max-w-3xl mx-auto mb-16 animate-fade-in">
-            <div className="gold-line" />
-            <h2 className="font-serif text-4xl lg:text-5xl mb-4 text-blue-900">
-              {t('ukDoctors.whatWeDoTitle')}
-            </h2>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            {[
-              { title: t('ukDoctors.whatWeDo1'), desc: t('ukDoctors.whatWeDo1Desc'), icon: '📊' },
-              { title: t('ukDoctors.whatWeDo2'), desc: t('ukDoctors.whatWeDo2Desc'), icon: '🎯' },
-              { title: t('ukDoctors.whatWeDo3'), desc: t('ukDoctors.whatWeDo3Desc'), icon: '✍️' },
-              { title: t('ukDoctors.whatWeDo4'), desc: t('ukDoctors.whatWeDo4Desc'), icon: '🎤' },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className={`p-8 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-teal-200 animate-stagger-${i + 1}`}
-              >
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="font-serif text-xl font-bold text-blue-900 mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {item.desc}
-                </p>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <SlideLeft>
+              <div className="relative">
+                <img
+                  src={IMAGES.doctors}
+                  alt="Doctor"
+                  className="rounded-2xl shadow-2xl w-full h-[450px] object-cover"
+                />
+                <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-teal-600" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-blue-900 text-sm">{lang === 'ar' ? 'جاهز للتقديم' : 'Application Ready'}</div>
+                      <div className="text-xs text-gray-500">{lang === 'ar' ? 'ملفك مكتمل' : 'Profile Complete'}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ))}
+            </SlideLeft>
+
+            <SlideRight>
+              <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
+              <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-6">
+                {t('ukDoctors.whatWeDoTitle')}
+              </h2>
+              <div className="space-y-6">
+                {[
+                  { title: t('ukDoctors.whatWeDo1'), desc: t('ukDoctors.whatWeDo1Desc') },
+                  { title: t('ukDoctors.whatWeDo2'), desc: t('ukDoctors.whatWeDo2Desc') },
+                  { title: t('ukDoctors.whatWeDo3'), desc: t('ukDoctors.whatWeDo3Desc') },
+                  { title: t('ukDoctors.whatWeDo4'), desc: t('ukDoctors.whatWeDo4Desc') },
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-4 items-start group">
+                    <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-500 transition-colors duration-300">
+                      <span className="text-teal-600 font-bold group-hover:text-white transition-colors duration-300">{i + 1}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-blue-900 mb-1">{item.title}</h4>
+                      <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SlideRight>
           </div>
         </div>
       </section>
 
       {/* ===== REQUIREMENTS ===== */}
-      <section className="py-20 lg:py-32 bg-white">
+      <section className="py-24 lg:py-32 bg-white">
         <div className="container">
-          <div className="max-w-3xl mx-auto mb-16 animate-fade-in">
-            <div className="gold-line" />
-            <h2 className="font-serif text-4xl lg:text-5xl mb-4 text-blue-900">
+          <FadeUp className="max-w-3xl mx-auto mb-16 text-center">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
               {t('ukDoctors.requirementsTitle')}
             </h2>
-          </div>
+          </FadeUp>
 
-          <div className="max-w-2xl mx-auto space-y-4">
+          <StaggerContainer className="max-w-2xl mx-auto space-y-4" staggerDelay={0.1}>
             {[
               t('ukDoctors.req1'),
               t('ukDoctors.req2'),
               t('ukDoctors.req3'),
               t('ukDoctors.req4'),
             ].map((req, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-4 p-6 bg-gradient-to-r from-blue-50 to-white rounded-lg border border-blue-100 hover:border-teal-200 transition-colors duration-300"
-              >
-                <CheckCircle className="w-6 h-6 text-teal-500 flex-shrink-0 mt-1" />
-                <span className="text-gray-700 text-lg">{req}</span>
-              </div>
+              <StaggerItem key={i}>
+                <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-blue-50 to-white rounded-xl border border-gray-100 hover:border-teal-200 hover:shadow-md transition-all duration-300">
+                  <CheckCircle className="w-6 h-6 text-teal-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 text-lg">{req}</span>
+                </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-20 lg:py-32 bg-gradient-to-r from-blue-900 to-blue-950 text-white">
-        <div className="container text-center animate-fade-in">
-          <h2 className="font-serif text-4xl lg:text-5xl mb-6">
-            Ready to Pursue Your NHS Career?
-          </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Our team will assess your profile and guide you through every step of the application process.
-          </p>
-          <Link href="/apply">
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white px-10 py-7 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              Start Your Assessment
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
+      <section className="relative py-24 lg:py-32 overflow-hidden">
+        <img src={IMAGES.ward} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-blue-900/90" />
+        <div className="container relative z-10 text-center">
+          <FadeUp>
+            <h2 className="font-serif text-4xl lg:text-5xl text-white mb-6">
+              {lang === 'ar' ? 'مستعد لبدء مسيرتك في NHS؟' : 'Ready to Pursue Your NHS Career?'}
+            </h2>
+            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+              {lang === 'ar' ? 'فريقنا سيقيّم ملفك ويرشدك خطوة بخطوة خلال عملية التقديم' : 'Our team will assess your profile and guide you through every step of the application process'}
+            </p>
+            <Link href="/apply">
+              <Button className="bg-teal-500 hover:bg-teal-400 text-white px-10 py-7 text-lg rounded-xl shadow-2xl shadow-teal-500/30 transition-all duration-300 hover:scale-105 active:scale-95">
+                {lang === 'ar' ? 'ابدأ التقييم' : 'Start Your Assessment'}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+          </FadeUp>
         </div>
       </section>
     </div>

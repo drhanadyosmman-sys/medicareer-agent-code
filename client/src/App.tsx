@@ -21,6 +21,8 @@ import AdminCountries from "./pages/admin/AdminCountries";
 import AdminPricing from "./pages/admin/AdminPricing";
 import AdminNHSJobs from "./pages/admin/AdminNHSJobs";
 import AdminQueue from "./pages/admin/AdminQueue";
+import AdminJobEngine from "./pages/admin/AdminJobEngine";
+import AdminFollowUp from "./pages/admin/AdminFollowUp";
 import { useLocation } from "wouter";
 
 function AdminRoutes() {
@@ -30,6 +32,8 @@ function AdminRoutes() {
         <Route path="/admin" component={AdminApplications} />
         <Route path="/admin/nhs-jobs" component={AdminNHSJobs} />
         <Route path="/admin/queue" component={AdminQueue} />
+        <Route path="/admin/job-engine" component={AdminJobEngine} />
+        <Route path="/admin/follow-up" component={AdminFollowUp} />
         <Route path="/admin/countries" component={AdminCountries} />
         <Route path="/admin/pricing" component={AdminPricing} />
         <Route component={AdminApplications} />
