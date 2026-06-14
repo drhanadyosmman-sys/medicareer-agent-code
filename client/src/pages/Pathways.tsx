@@ -1,13 +1,13 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
-import { ArrowRight, GraduationCap, Briefcase } from 'lucide-react';
-import { FadeUp, SlideLeft, SlideRight, StaggerContainer, StaggerItem } from '@/components/ScrollAnimations';
+import { ArrowRight, GraduationCap, Briefcase, CheckCircle } from 'lucide-react';
+import { FadeUp, SlideLeft, SlideRight } from '@/components/ScrollAnimations';
 
 const IMAGES = {
-  hero: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1400&q=80', // Modern building
-  training: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&q=80', // Medical training
-  nhs: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80', // Hospital
+  hero: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1400&q=80',
+  training: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&q=80',
+  nhs: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80',
 };
 
 export default function Pathways() {
@@ -32,16 +32,18 @@ export default function Pathways() {
         </div>
       </section>
 
-      {/* ===== TWO PATHWAYS ===== */}
+      {/* ===== TWO SERVICE CARDS ===== */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="container">
           <FadeUp className="text-center mb-16">
             <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
             <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
-              {lang === 'ar' ? 'اختر مسارك المهني' : 'Choose Your Career Path'}
+              {lang === 'ar' ? 'كيف نساعدك' : 'How We Help You'}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {lang === 'ar' ? 'مساران واضحان نحو مستقبلك الطبي في المملكة المتحدة' : 'Two clear pathways to your medical future in the United Kingdom'}
+              {lang === 'ar'
+                ? 'نتولى عملية البحث والتقديم بالكامل — أنت تركّز على طبك'
+                : 'We handle the entire search and application process — you focus on your medicine'}
             </p>
           </FadeUp>
 
@@ -59,21 +61,26 @@ export default function Pathways() {
                   </div>
                 </div>
                 <div className="p-8 bg-white">
-                  <h3 className="font-serif text-2xl font-bold text-blue-900 mb-4">
-                    {t('pathways.journey1')}
-                  </h3>
+                  <div className="mb-4">
+                    <h3 className="font-serif text-2xl font-bold text-blue-900">
+                      {t('pathways.journey1')}
+                    </h3>
+                    <span className="inline-block mt-1 text-sm font-semibold text-teal-600 bg-teal-50 px-3 py-1 rounded-full">
+                      {t('pathways.journey1Subtitle')}
+                    </span>
+                  </div>
                   <p className="text-gray-600 leading-relaxed mb-6">
                     {t('pathways.journey1Desc')}
                   </p>
                   <ul className="space-y-3 mb-8">
                     {[
-                      lang === 'ar' ? 'وظائف Foundation Doctor (FY1/FY2)' : 'Foundation Doctor (FY1/FY2) positions',
-                      lang === 'ar' ? 'برامج التدريب التخصصي' : 'Specialty Training programmes',
-                      lang === 'ar' ? 'مسار واضح نحو الاستشاري' : 'Structured progression to Consultant',
-                      lang === 'ar' ? 'تطوير مهني طويل المدى' : 'Long-term career development',
+                      t('pathways.journey1Bullet1'),
+                      t('pathways.journey1Bullet2'),
+                      t('pathways.journey1Bullet3'),
+                      t('pathways.journey1Bullet4'),
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3 text-gray-700">
-                        <span className="text-teal-500 font-bold mt-0.5">✓</span>
+                        <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -101,21 +108,26 @@ export default function Pathways() {
                   </div>
                 </div>
                 <div className="p-8 bg-white">
-                  <h3 className="font-serif text-2xl font-bold text-blue-900 mb-4">
-                    {t('pathways.journey2')}
-                  </h3>
+                  <div className="mb-4">
+                    <h3 className="font-serif text-2xl font-bold text-blue-900">
+                      {t('pathways.journey2')}
+                    </h3>
+                    <span className="inline-block mt-1 text-sm font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+                      {t('pathways.journey2Subtitle')}
+                    </span>
+                  </div>
                   <p className="text-gray-600 leading-relaxed mb-6">
                     {t('pathways.journey2Desc')}
                   </p>
                   <ul className="space-y-3 mb-8">
                     {[
-                      lang === 'ar' ? 'وظائف Clinical Fellow' : 'Clinical Fellow positions',
-                      lang === 'ar' ? 'وظائف Trust Grade / SAS Doctor' : 'Trust Grade / SAS Doctor roles',
-                      lang === 'ar' ? 'توظيف فوري في NHS' : 'Immediate NHS employment',
-                      lang === 'ar' ? 'مرونة في ساعات العمل' : 'Flexible working arrangements',
+                      t('pathways.journey2Bullet1'),
+                      t('pathways.journey2Bullet2'),
+                      t('pathways.journey2Bullet3'),
+                      t('pathways.journey2Bullet4'),
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3 text-gray-700">
-                        <span className="text-amber-500 font-bold mt-0.5">✓</span>
+                        <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -133,6 +145,64 @@ export default function Pathways() {
         </div>
       </section>
 
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="py-24 lg:py-32 bg-gradient-to-b from-blue-50 to-white">
+        <div className="container">
+          <FadeUp className="text-center mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
+              {lang === 'ar' ? 'ماذا نفعل بالضبط؟' : 'What Exactly Do We Do?'}
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              {lang === 'ar'
+                ? 'نتولى كل خطوة في عملية التقديم — من البحث عن الوظيفة حتى تلقي العرض'
+                : 'We handle every step of the application process — from finding the job to receiving the offer'}
+            </p>
+          </FadeUp>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                {
+                  step: '01',
+                  title: lang === 'ar' ? 'نقيّم ملفك' : 'We Assess Your Profile',
+                  desc: lang === 'ar' ? 'نراجع سيرتك الذاتية ومستنداتك ونحدد نقاط القوة والضعف' : 'We review your CV and documents, identifying strengths and areas for improvement',
+                  color: 'bg-blue-100 text-blue-700',
+                },
+                {
+                  step: '02',
+                  title: lang === 'ar' ? 'نبحث عن الوظائف' : 'We Search for Jobs',
+                  desc: lang === 'ar' ? 'نبحث يومياً في NHS Jobs وغيرها عن الوظائف التي تناسب ملفك' : 'We search NHS Jobs daily for vacancies that match your profile and experience',
+                  color: 'bg-teal-100 text-teal-700',
+                },
+                {
+                  step: '03',
+                  title: lang === 'ar' ? 'نجهّز طلبك' : 'We Prepare Your Application',
+                  desc: lang === 'ar' ? 'نعيد كتابة سيرتك الذاتية ونجهّز خطاب التغطية والمعلومات الداعمة لكل وظيفة' : 'We rewrite your CV, craft a cover letter, and prepare supporting information tailored to each role',
+                  color: 'bg-amber-100 text-amber-700',
+                },
+                {
+                  step: '04',
+                  title: lang === 'ar' ? 'نقدّم ونتابع' : 'We Submit & Follow Up',
+                  desc: lang === 'ar' ? 'نقدّم الطلب نيابةً عنك ونتابع الردود ونجهّزك للمقابلة عند الترشيح' : 'We submit the application on your behalf, track responses, and prepare you for interview when shortlisted',
+                  color: 'bg-purple-100 text-purple-700',
+                },
+              ].map((item, i) => (
+                <FadeUp key={i} delay={i * 0.1}>
+                  <div className="p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100">
+                    <div className={`w-10 h-10 rounded-lg ${item.color} flex items-center justify-center font-bold text-sm mb-4`}>
+                      {item.step}
+                    </div>
+                    <h4 className="font-semibold text-blue-900 mb-2">{item.title}</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
+                  </div>
+                </FadeUp>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== CTA ===== */}
       <section className="relative py-24 lg:py-32 overflow-hidden">
         <img src={IMAGES.hero} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -140,10 +210,12 @@ export default function Pathways() {
         <div className="container relative z-10 text-center">
           <FadeUp>
             <h2 className="font-serif text-4xl lg:text-5xl text-white mb-6">
-              {lang === 'ar' ? 'مستعد لبدء رحلتك؟' : 'Ready to Start Your Journey?'}
+              {lang === 'ar' ? 'مستعد لنتولى التقديم بدلاً منك؟' : 'Ready for Us to Apply on Your Behalf?'}
             </h2>
             <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-              {lang === 'ar' ? 'فريقنا سيساعدك في تحديد المسار الأنسب لمسيرتك المهنية ويرافقك في كل خطوة' : 'Our team will help you determine the best pathway and guide you every step of the way'}
+              {lang === 'ar'
+                ? 'ابدأ بتقييم مجاني — فريقنا سيراجع ملفك ويحدد أفضل الفرص لك'
+                : 'Start with a free assessment — our team will review your profile and identify the best opportunities for you'}
             </p>
             <Link href="/apply">
               <Button className="bg-teal-500 hover:bg-teal-400 text-white px-10 py-7 text-lg rounded-xl shadow-2xl shadow-teal-500/30 transition-all duration-300 hover:scale-105 active:scale-95">
