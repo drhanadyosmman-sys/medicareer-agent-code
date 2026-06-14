@@ -19,6 +19,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminApplications from "./pages/admin/AdminApplications";
 import AdminCountries from "./pages/admin/AdminCountries";
 import AdminPricing from "./pages/admin/AdminPricing";
+import AdminNHSJobs from "./pages/admin/AdminNHSJobs";
 import { useLocation } from "wouter";
 
 function AdminRoutes() {
@@ -26,6 +27,7 @@ function AdminRoutes() {
     <AdminLayout>
       <Switch>
         <Route path="/admin" component={AdminApplications} />
+        <Route path="/admin/nhs-jobs" component={AdminNHSJobs} />
         <Route path="/admin/countries" component={AdminCountries} />
         <Route path="/admin/pricing" component={AdminPricing} />
         <Route component={AdminApplications} />
