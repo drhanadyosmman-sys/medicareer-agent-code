@@ -231,9 +231,9 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {application.readinessScore >= 80 ? 'Your profile is strong. Our team is preparing applications for suitable roles.' :
-                       application.readinessScore >= 60 ? 'Good progress. Complete the recommended steps below to strengthen your application.' :
-                       'There are several areas to improve. Follow the recommended steps to increase your readiness.'}
+                      {application.readinessScore >= 80 ? t('dashboard.profileStrong') :
+                       application.readinessScore >= 60 ? t('dashboard.profileGood') :
+                       t('dashboard.profileWeak')}
                     </p>
                   </CardContent>
                 </Card>
@@ -270,39 +270,39 @@ export default function Dashboard() {
                 {/* Recent Messages Preview */}
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                    <CardTitle className="font-serif text-lg text-navy flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5" /> Recent Messages
+                      <CardTitle className="font-serif text-lg text-navy flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5" /> {t('dashboard.recentMessages')}
                       {unreadCount > 0 && (
-                        <Badge className="bg-teal text-white text-xs">{unreadCount} new</Badge>
+                        <Badge className="bg-teal text-white text-xs">{unreadCount} {t('dashboard.newBadge')}</Badge>
                       )}
                     </CardTitle>
                     <Button variant="ghost" size="sm" onClick={() => setActiveTab('messages')} className="text-teal hover:text-teal/80 text-xs">
-                      View all <ArrowRight className="w-3 h-3 ml-1" />
+                      {t('dashboard.viewAll')} <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
                   </CardHeader>
                   <CardContent>
                     {application.messages.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-4">No messages yet. Our team will be in touch shortly.</p>
+                      <p className="text-sm text-muted-foreground text-center py-4">{t('dashboard.noMessages')}</p>
                     ) : (
                       <div className="space-y-3">
                         {application.messages.slice(-3).map(msg => (
                           <div key={msg.id} className={`p-3 rounded-lg ${msg.from === 'admin' ? 'bg-navy/5 border-l-2 border-teal' : 'bg-muted ml-6'}`}>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs font-medium text-navy">
-                                {msg.from === 'admin' ? 'Career Consultant' : 'You'}
+                                {msg.from === 'admin' ? t('dashboard.careerConsultant') : t('dashboard.you')}
                               </span>
                               <span className="text-xs text-muted-foreground">
                                 {new Date(msg.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                               </span>
                               {!msg.read && msg.from === 'admin' && (
-                                <Badge variant="secondary" className="text-xs bg-teal/10 text-teal py-0">New</Badge>
+                                <Badge variant="secondary" className="text-xs bg-teal/10 text-teal py-0">{t('dashboard.newBadge')}</Badge>
                               )}
                             </div>
                             <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2">{msg.content}</p>
                           </div>
                         ))}
                         <Button variant="outline" size="sm" className="w-full btn-press" onClick={() => setActiveTab('messages')}>
-                          Open Full Chat <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                          {t('dashboard.openFullChat')} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                         </Button>
                       </div>
                     )}
@@ -316,12 +316,12 @@ export default function Dashboard() {
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-3">
                     <CardTitle className="font-serif text-base text-navy flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-gold" /> Missing Documents
+                      <AlertCircle className="w-4 h-4 text-gold" /> {t('dashboard.missingDocs')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {application.missingDocuments.length === 0 ? (
-                      <p className="text-sm text-teal flex items-center gap-2"><CheckCircle className="w-4 h-4" /> All documents uploaded</p>
+                      <p className="text-sm text-teal flex items-center gap-2"><CheckCircle className="w-4 h-4" /> {t('dashboard.allDocsUploaded')}</p>
                     ) : (
                       <ul className="space-y-2">
                         {application.missingDocuments.map((doc, i) => (
@@ -333,7 +333,7 @@ export default function Dashboard() {
                       </ul>
                     )}
                     <Button variant="outline" size="sm" className="w-full mt-4 btn-press" onClick={() => setActiveTab('documents')}>
-                      <Upload className="w-4 h-4 mr-2" /> Upload Documents
+                      <Upload className="w-4 h-4 mr-2" /> {t('dashboard.uploadDocuments')}
                     </Button>
                   </CardContent>
                 </Card>
