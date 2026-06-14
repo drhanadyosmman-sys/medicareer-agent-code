@@ -16,9 +16,9 @@ export default function Pathways() {
         <div className="container">
           <div className="max-w-2xl">
             <div className="gold-line" />
-            <h1 className="font-serif text-4xl lg:text-5xl mb-4">Career Pathways</h1>
+            <h1 className="font-serif text-4xl lg:text-5xl mb-4">Global Career Pathways</h1>
             <p className="text-white/70 text-lg leading-relaxed">
-              We support medical professionals seeking international career opportunities. Choose your destination country and profession to begin.
+              We support doctors and medical professionals from around the world in securing international career opportunities. Choose your destination country to begin.
             </p>
           </div>
         </div>

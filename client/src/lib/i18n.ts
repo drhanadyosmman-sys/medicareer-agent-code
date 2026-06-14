@@ -21,10 +21,10 @@ export const translations = {
 
   // ===== HOMEPAGE =====
   home: {
-    badge: { en: 'UK Doctor Jobs — Now Open', ar: 'وظائف أطباء بريطانيا — متاحة الآن' },
-    heroTitle: { en: 'Get Shortlisted for Medical Jobs with Expert Application Support', ar: 'احصل على فرصة للترشيح للوظائف الطبية بدعم احترافي للتقديم' },
-    heroDesc: { en: 'Upload your CV. We assess your readiness, match you with suitable roles, prepare your application documents, and support you until the interview stage.', ar: 'ارفع سيرتك الذاتية. نقيّم جاهزيتك، نطابقك مع الوظائف المناسبة، نجهّز مستندات التقديم، وندعمك حتى مرحلة المقابلة.' },
-    ctaButton: { en: 'Start Your UK Doctor Assessment', ar: 'ابدأ تقييمك لوظائف بريطانيا' },
+    badge: { en: 'Now Accepting Applications — UK, Gulf, Australia & More', ar: 'نقبل الطلبات الآن — بريطانيا، الخليج، أستراليا والمزيد' },
+    heroTitle: { en: 'Launch Your International Medical Career with Expert Application Support', ar: 'انطلق في مسيرتك الطبية الدولية بدعم احترافي للتقديم' },
+    heroDesc: { en: 'We help doctors from around the world secure positions in the UK, Gulf, Australia, Canada, and beyond. Upload your CV — our team assesses your readiness, matches you with suitable roles, and prepares every application.', ar: 'نساعد الأطباء من جميع أنحاء العالم في الحصول على وظائف في بريطانيا، الخليج، أستراليا، كندا وغيرها. ارفع سيرتك الذاتية — فريقنا يقيّم جاهزيتك، يطابقك مع الوظائف المناسبة، ويجهّز كل طلب.' },
+    ctaButton: { en: 'Start Your Career Assessment', ar: 'ابدأ تقييمك المهني' },
     uploadCv: { en: 'Upload Your CV', ar: 'ارفع سيرتك الذاتية' },
     noCommitment: { en: 'No upfront commitment', ar: 'بدون التزام مسبق' },
     personalConsultant: { en: 'Personal consultant', ar: 'مستشار شخصي' },
@@ -54,8 +54,8 @@ export const translations = {
       p5: { en: 'Prepare you for NHS-style interviews with personalised questions', ar: 'نجهّزك لمقابلات بأسلوب NHS مع أسئلة مخصصة' },
       p6: { en: 'Provide ongoing guidance until you secure an interview', ar: 'نقدم توجيهاً مستمراً حتى تحصل على مقابلة' },
     },
-    ukPathwayTitle: { en: 'UK Doctor Jobs Pathway', ar: 'مسار وظائف أطباء بريطانيا' },
-    ukPathwayDesc: { en: 'Our flagship service for international medical graduates seeking NHS positions in the United Kingdom.', ar: 'خدمتنا الرئيسية للخريجين الطبيين الدوليين الباحثين عن وظائف NHS في المملكة المتحدة.' },
+    ukPathwayTitle: { en: 'Featured Pathway: UK Doctor Jobs', ar: 'المسار المميز: وظائف أطباء بريطانيا' },
+    ukPathwayDesc: { en: 'Our first active pathway — helping international medical graduates secure NHS positions across England, Scotland, Wales, and Northern Ireland. More countries launching soon.', ar: 'مسارنا النشط الأول — نساعد الخريجين الطبيين الدوليين في الحصول على وظائف NHS. مسارات إضافية قريباً.' },
     jobType1: { en: 'Junior Clinical Fellow', ar: 'زميل سريري مبتدئ' },
     jobType1Desc: { en: 'Entry-level positions suitable for doctors with completed internship and basic clinical experience.', ar: 'وظائف مبتدئة مناسبة للأطباء الذين أكملوا التدريب الأساسي ولديهم خبرة سريرية.' },
     jobType2: { en: 'Trust Grade Doctor', ar: 'طبيب بدرجة Trust' },
@@ -85,10 +85,10 @@ export const translations = {
     testimonial1: { en: 'The team completely transformed my CV and supporting information. I received interview invitations within weeks of submitting my applications.', ar: 'الفريق حوّل سيرتي الذاتية ومعلوماتي الداعمة بالكامل. تلقيت دعوات مقابلة خلال أسابيع من تقديم طلباتي.' },
     testimonial2: { en: 'I had applied to over 30 positions with no response. After working with MediCareer Agent, I was shortlisted for 4 interviews from 8 applications.', ar: 'قدمت على أكثر من 30 وظيفة بدون رد. بعد العمل مع MediCareer Agent، تم ترشيحي لـ 4 مقابلات من 8 طلبات.' },
     testimonial3: { en: 'The interview preparation was invaluable. The questions they prepared were almost identical to what I was asked. I felt confident and well-prepared.', ar: 'تحضير المقابلة كان لا يقدر بثمن. الأسئلة التي جهّزوها كانت شبه مطابقة لما سُئلت. شعرت بالثقة والاستعداد.' },
-    ctaFinalTitle: { en: 'Your Qualifications Deserve an Application That Matches Them', ar: 'مؤهلاتك تستحق طلباً يليق بها' },
-    ctaFinalDesc: { en: 'We help convert your experience into a strong, role-specific application. Begin your assessment today.', ar: 'نساعدك في تحويل خبرتك إلى طلب قوي ومخصص. ابدأ تقييمك اليوم.' },
+    ctaFinalTitle: { en: 'Your Medical Career Deserves a Global Stage', ar: 'مسيرتك الطبية تستحق منصة عالمية' },
+    ctaFinalDesc: { en: 'Doctors from over 30 countries have used our service to secure positions in the UK and internationally. Begin your assessment today.', ar: 'أطباء من أكثر من 30 دولة استخدموا خدمتنا للحصول على وظائف في بريطانيا ودولياً. ابدأ تقييمك اليوم.' },
     beginAssessment: { en: 'Begin Your Career Assessment', ar: 'ابدأ تقييمك المهني' },
-    learnAboutUk: { en: 'Learn About UK Pathway', ar: 'تعرّف على المسار البريطاني' },
+    learnAboutUk: { en: 'View UK Pathway', ar: 'عرض المسار البريطاني' },
   },
 
   // ===== FOOTER =====

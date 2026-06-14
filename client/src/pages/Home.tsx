@@ -6,7 +6,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CheckCircle, FileText, Users, Target, ArrowRight, Upload, ClipboardCheck, Briefcase, Star } from 'lucide-react';
 
 const HERO_BG = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663502631447/3tsQVrLUcXjTB9oAq7mMW6/hero-abstract-medical-MG2uiVTSCLxeVn2oSXijhn.webp';
-const DOCTOR_IMG = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663502631447/3tsQVrLUcXjTB9oAq7mMW6/hero-doctor-professional-R2yqzwKr3yTw2haD49QGKW.webp';
+const HOSPITAL_IMG = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663502631447/3tsQVrLUcXjTB9oAq7mMW6/hero-international-hospital-TDi868hZuAqsUKDiyQ7J9L.webp';
+const CORRIDOR_IMG = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663502631447/3tsQVrLUcXjTB9oAq7mMW6/hero-hospital-corridor-3bwd4F4SdV2nSRPES8pk2i.webp';
 
 export default function Home() {
   const { t, lang } = useLanguage();
@@ -52,9 +53,11 @@ export default function Home() {
         <div className="container relative z-10 py-20 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-white/80">
-                <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
-                {t('home.badge')}
+              <div className="flex flex-wrap gap-2 mb-2">
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-white/80">
+                  <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
+                  {t('home.badge')}
+                </div>
               </div>
               <h1 className="font-serif text-4xl lg:text-5xl xl:text-[3.4rem] text-white leading-[1.15] tracking-tight">
                 {t('home.heroTitle')}
@@ -76,7 +79,26 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
-              <div className="flex items-center gap-6 pt-4 text-sm text-white/50">
+              {/* Country flags */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <span className="text-xs text-white/40 uppercase tracking-wider">{lang === 'ar' ? 'الوجهات:' : 'Destinations:'}</span>
+                {[
+                  { flag: '🇬🇧', label: lang === 'ar' ? 'بريطانيا' : 'UK', active: true },
+                  { flag: '🇦🇪', label: lang === 'ar' ? 'الخليج' : 'Gulf', active: false },
+                  { flag: '🇦🇺', label: lang === 'ar' ? 'أستراليا' : 'Australia', active: false },
+                  { flag: '🇨🇦', label: lang === 'ar' ? 'كندا' : 'Canada', active: false },
+                  { flag: '🇩🇪', label: lang === 'ar' ? 'ألمانيا' : 'Germany', active: false },
+                ].map((c, i) => (
+                  <div key={i} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs ${
+                    c.active ? 'bg-teal/20 text-teal border border-teal/30' : 'bg-white/5 text-white/40 border border-white/10'
+                  }`}>
+                    <span>{c.flag}</span>
+                    <span>{c.label}</span>
+                    {!c.active && <span className="text-[10px] opacity-60">{lang === 'ar' ? 'قريباً' : 'Soon'}</span>}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-6 text-sm text-white/50">
                 <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-teal" /> {t('home.noCommitment')}</span>
                 <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-teal" /> {t('home.personalConsultant')}</span>
               </div>
@@ -84,7 +106,7 @@ export default function Home() {
             <div className="hidden lg:block">
               <div className="relative">
                 <div className="absolute -inset-4 bg-teal/20 rounded-2xl blur-2xl" />
-                <img src={DOCTOR_IMG} alt="Professional doctor" className="relative rounded-2xl shadow-2xl w-full object-cover aspect-[4/3]" />
+                <img src={HOSPITAL_IMG} alt="International medical facility" className="relative rounded-2xl shadow-2xl w-full object-cover aspect-[4/3]" />
               </div>
             </div>
           </div>
