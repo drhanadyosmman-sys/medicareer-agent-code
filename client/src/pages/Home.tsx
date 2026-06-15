@@ -26,9 +26,9 @@ export default function Home() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.3]);
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white">
       {/* ===== HERO SECTION - Full screen with parallax ===== */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+      <section ref={heroRef} className="relative min-h-[100svh] flex items-center overflow-hidden bg-[#0a1628]">
         {/* Background image with parallax */}
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
           <img
@@ -47,7 +47,7 @@ export default function Home() {
           <FloatingElement className="absolute top-1/4 right-1/4 w-3 h-3 bg-amber-400/30 rounded-full" amplitude={15} duration={4}><div /></FloatingElement>
         </div>
 
-        <motion.div className="container relative z-10 py-32" style={{ opacity: heroOpacity }}>
+        <div className="container relative z-10 py-24 md:py-32">
           <div className="max-w-3xl">
             {/* Main Headline */}
             <motion.h1
@@ -112,7 +112,7 @@ export default function Home() {
               </span>
             </motion.div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Scroll indicator */}
         <motion.div
