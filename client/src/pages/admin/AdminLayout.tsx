@@ -1,68 +1,146 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Users, Globe, CreditCard, LayoutDashboard, Briefcase, Send, Database, Bell } from 'lucide-react';
+import {
+  Users, Globe, CreditCard, LayoutDashboard, Briefcase, Send,
+  Database, Bell, Menu, X, ChevronRight
+} from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
-function getNavItems(t: (key: string) => string) {
-  return [
-    { href: '/admin', label: t('admin.applications'), icon: Users },
-    { href: '/admin/nhs-jobs', label: 'NHS Job Matching', icon: Briefcase },
-    { href: '/admin/queue', label: 'Application Queue', icon: Send },
-    { href: '/admin/job-engine', label: 'Job Collection', icon: Database },
-    { href: '/admin/follow-up', label: 'Follow-up Tracker', icon: Bell },
-    { href: '/admin/countries', label: t('admin.countries'), icon: Globe },
-    { href: '/admin/pricing', label: t('admin.pricingManager'), icon: CreditCard },
-  ];
-}
+const NAV_ITEMS = [
+  { href: '/admin', label: 'Applications', icon: Users, exact: true },
+  { href: '/admin/nhs-jobs', label: 'NHS Job Matching', icon: Briefcase },
+  { href: '/admin/queue', label: 'Application Queue', icon: Send },
+  { href: '/admin/job-engine', label: 'Job Collection', icon: Database },
+  { href: '/admin/follow-up', label: 'Follow-up Tracker', icon: Bell },
+  { href: '/admin/countries', label: 'Countries', icon: Globe },
+  { href: '/admin/pricing', label: 'Pricing', icon: CreditCard },
+];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { t } = useLanguage();
-  const NAV_ITEMS = getNavItems(t);
+  const { user, logout } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isActive = (item: typeof NAV_ITEMS[0]) =>
+    item.exact ? location === item.href : location.startsWith(item.href);
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)]">
-      {/* Sidebar */}
-      <aside className="w-64 bg-navy text-white shrink-0 hidden lg:block">
-        <div className="p-4 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-teal" />
-            <span className="font-semibold text-sm">{t('nav.admin')}</span>
+    <div className="flex h-screen overflow-hidden pt-16 lg:pt-20">
+      {/* ===== DESKTOP SIDEBAR — always visible ===== */}
+      <aside className="hidden lg:flex flex-col w-64 bg-[#0a1628] text-white flex-shrink-0 h-full overflow-y-auto">
+        {/* Brand header */}
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-white/10">
+          <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
+            <LayoutDashboard className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <div className="font-semibold text-sm text-white">Admin Panel</div>
+            <div className="text-xs text-white/50">{user?.name || 'Administrator'}</div>
           </div>
         </div>
-        <nav className="p-3 space-y-1">
+
+        {/* Nav items */}
+        <nav className="flex-1 p-3 space-y-0.5">
           {NAV_ITEMS.map(item => {
-            const isActive = location === item.href || (item.href !== '/admin' && location.startsWith(item.href));
+            const active = isActive(item);
             return (
               <Link key={item.href} href={item.href}>
-                <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive ? 'bg-teal/20 text-teal' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}>
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
+                <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  active
+                    ? 'bg-teal-500/20 text-teal-400 border border-teal-500/20'
+                    : 'text-white/60 hover:bg-white/5 hover:text-white'
+                }`}>
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="flex-1">{item.label}</span>
+                  {active && <ChevronRight className="w-3.5 h-3.5 text-teal-400" />}
                 </div>
               </Link>
             );
           })}
         </nav>
+
+        {/* Footer */}
+        <div className="p-3 border-t border-white/10">
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-white/40 hover:text-white/70 rounded-lg hover:bg-white/5 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
       </aside>
 
-      {/* Mobile nav */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-navy border-t border-white/10 z-50 p-2 flex justify-around">
-        {NAV_ITEMS.map(item => {
-          const isActive = location === item.href || (item.href !== '/admin' && location.startsWith(item.href));
-          return (
-            <Link key={item.href} href={item.href}>
-              <div className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs ${isActive ? 'text-teal' : 'text-white/60'}`}>
-                <item.icon className="w-4 h-4" />
-                {item.label.split(' ')[0]}
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      {/* ===== MOBILE SIDEBAR TOGGLE ===== */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-20 left-4 z-50 w-10 h-10 bg-[#0a1628] text-white rounded-lg flex items-center justify-center shadow-lg"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
 
-      {/* Main content */}
-      <main className="flex-1 bg-ivory p-6 lg:p-8 overflow-auto pb-20 lg:pb-8">
-        {children}
+      {/* ===== MOBILE SIDEBAR OVERLAY ===== */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Sidebar panel */}
+          <aside className="relative w-72 bg-[#0a1628] text-white h-full overflow-y-auto flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
+                  <LayoutDashboard className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Admin Panel</div>
+                  <div className="text-xs text-white/50">{user?.name || 'Administrator'}</div>
+                </div>
+              </div>
+              <button onClick={() => setMobileOpen(false)} className="text-white/50 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <nav className="flex-1 p-3 space-y-0.5">
+              {NAV_ITEMS.map(item => {
+                const active = isActive(item);
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <div
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                        active
+                          ? 'bg-teal-500/20 text-teal-400'
+                          : 'text-white/60 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
+                      {item.label}
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="p-3 border-t border-white/10">
+              <button
+                onClick={() => { logout(); setMobileOpen(false); }}
+                className="w-full text-left px-3 py-2 text-xs text-white/40 hover:text-white/70 rounded-lg hover:bg-white/5"
+              >
+                Sign Out
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* ===== MAIN CONTENT ===== */}
+      <main className="flex-1 bg-gray-50 overflow-y-auto">
+        <div className="p-6 lg:p-8 max-w-full">
+          {children}
+        </div>
       </main>
     </div>
   );
