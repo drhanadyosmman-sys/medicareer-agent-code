@@ -40,6 +40,16 @@ export const translations: Record<string, Record<string, Record<Language, string
     applications: { en: 'Applications', ar: 'الطلبات' },
     countries: { en: 'Countries', ar: 'الدول' },
     pricingManager: { en: 'Pricing', ar: 'الأسعار' },
+    searchPlaceholder: { en: 'Search by name, email, or specialty...', ar: 'ابحث بالاسم أو البريد أو التخصص...' },
+    totalApplicants: { en: 'total applicants', ar: 'متقدم إجمالاً' },
+    filterAll: { en: 'All Stages', ar: 'جميع المراحل' },
+    noApplications: { en: 'No applications found', ar: 'لا توجد طلبات' },
+    viewProfile: { en: 'View Profile', ar: 'عرض الملف' },
+    addNote: { en: 'Add Note', ar: 'إضافة ملاحظة' },
+    sendMessage: { en: 'Send Message', ar: 'إرسال رسالة' },
+    changeStage: { en: 'Change Stage', ar: 'تغيير المرحلة' },
+    staffWorkspace: { en: 'Staff Workspace', ar: 'مساحة عمل الفريق' },
+    downloadDocs: { en: 'Download Documents', ar: 'تحميل المستندات' },
   },
 
   // ===== HOMEPAGE =====

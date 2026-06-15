@@ -23,12 +23,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Textarea } from '@/components/ui/textarea';
 
 const STAGES = [
-  { key: 'submitted', label: 'Submitted', icon: CheckCircle },
-  { key: 'under-review', label: 'Under Review', icon: Clock },
-  { key: 'cv-optimization', label: 'CV Optimisation', icon: FileText },
-  { key: 'job-matching', label: 'Job Matching', icon: ArrowRight },
-  { key: 'applications-prepared', label: 'Applications Prepared', icon: FileText },
-  { key: 'interview-preparation', label: 'Interview Preparation', icon: User },
+  { key: 'submitted', label: 'Submitted', labelAr: 'تم الإرسال', icon: CheckCircle },
+  { key: 'under-review', label: 'Under Review', labelAr: 'قيد المراجعة', icon: Clock },
+  { key: 'cv-optimization', label: 'CV Review', labelAr: 'مراجعة السيرة', icon: FileText },
+  { key: 'job-matching', label: 'Matching', labelAr: 'مطابقة', icon: ArrowRight },
+  { key: 'applications-prepared', label: 'Applied', labelAr: 'تم التقديم', icon: FileText },
+  { key: 'interview-preparation', label: 'Interview', labelAr: 'مقابلة', icon: User },
 ];
 
 const DOC_CATEGORIES = [
@@ -271,25 +271,45 @@ export default function Dashboard() {
                     <CardTitle className="font-serif text-lg text-navy">{t('dashboard.progressTitle')}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-1 overflow-x-auto pb-2">
-                      {STAGES.map((stage, i) => (
-                        <div key={stage.key} className="flex items-center">
-                          <div className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap ${
-                            i < currentStageIdx ? 'bg-teal/10 text-teal' :
-                            i === currentStageIdx ? 'bg-navy text-white' :
-                            'bg-muted text-muted-foreground'
-                          }`}>
-                            {i < currentStageIdx ? <CheckCircle className="w-3.5 h-3.5" /> :
-                             i === currentStageIdx ? <Clock className="w-3.5 h-3.5 animate-pulse" /> :
-                             <Clock className="w-3.5 h-3.5" />}
-                            {stage.label}
-                          </div>
-                          {i < STAGES.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 mx-0.5" />}
-                        </div>
-                      ))}
+                    {/* Progress bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+                        <span>{lang === 'ar' ? STAGES[0].labelAr : STAGES[0].label}</span>
+                        <span>{lang === 'ar' ? STAGES[STAGES.length - 1].labelAr : STAGES[STAGES.length - 1].label}</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-teal-400 to-teal-600 rounded-full transition-all duration-500"
+                          style={{ width: `${((currentStageIdx + 1) / STAGES.length) * 100}%` }}
+                        />
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-3">
-                      {t('dashboard.currentStage')}: <strong className="text-navy">{STAGES[currentStageIdx]?.label}</strong>
+                    {/* Step grid */}
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      {STAGES.map((stage, i) => {
+                        const Icon = stage.icon;
+                        const done = i < currentStageIdx;
+                        const active = i === currentStageIdx;
+                        return (
+                          <div key={stage.key} className="flex flex-col items-center gap-1 text-center">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                              done ? 'bg-teal-100 text-teal-600' :
+                              active ? 'bg-blue-900 text-white ring-2 ring-blue-900 ring-offset-2' :
+                              'bg-gray-100 text-gray-400'
+                            }`}>
+                              {done ? <CheckCircle className="w-4 h-4" /> : <Icon className={`w-4 h-4 ${active ? 'animate-pulse' : ''}`} />}
+                            </div>
+                            <span className={`text-[10px] leading-tight font-medium ${
+                              done ? 'text-teal-600' : active ? 'text-blue-900' : 'text-gray-400'
+                            }`}>
+                              {lang === 'ar' ? stage.labelAr : stage.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-4 pt-3 border-t">
+                      {t('dashboard.currentStage')}: <strong className="text-navy">{lang === 'ar' ? STAGES[currentStageIdx]?.labelAr : STAGES[currentStageIdx]?.label}</strong>
                     </p>
                   </CardContent>
                 </Card>
