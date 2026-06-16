@@ -28,6 +28,7 @@ import AdminJobs from "./pages/admin/AdminJobs";
 import { useLocation } from "wouter";
 
 function AdminRoutes() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <AdminLayout>
       <Switch>

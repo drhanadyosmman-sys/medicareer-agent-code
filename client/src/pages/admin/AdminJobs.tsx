@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { trpc } from '@/lib/trpc';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -259,9 +260,33 @@ export default function AdminJobs() {
 
       {/* Add Job Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Add New NHS Job</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-4">
+            {/* NHS Jobs Link */}
+            <a href="https://www.jobs.nhs.uk/candidate/search" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 hover:bg-blue-100 transition-colors">
+              <ExternalLink className="w-4 h-4" />
+              Browse NHS Jobs → jobs.nhs.uk
+            </a>
+
+            {/* Screenshot Paste/Upload Area */}
+            <ScreenshotDropZone onExtracted={(data) => {
+              setNewJob(p => ({
+                ...p,
+                title: data.title || p.title,
+                hospital: data.hospital || p.hospital,
+                location: data.location || p.location,
+                salaryRange: data.salaryRange || p.salaryRange,
+                specialty: SPECIALTIES.includes(data.specialty) ? data.specialty : p.specialty,
+                rank: RANKS.includes(data.rank) ? data.rank : p.rank,
+                closingDate: data.closingDate || p.closingDate,
+                nhsJobsLink: data.nhsJobsLink || p.nhsJobsLink,
+                description: data.description || p.description,
+              }));
+              toast.success('Fields auto-filled from screenshot');
+            }} />
+
+            {/* Form Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2"><Label>Job Title *</Label><Input value={newJob.title} onChange={e => setNewJob(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Clinical Fellow in Acute Medicine" className="mt-1" /></div>
               <div><Label>Hospital/Trust *</Label><Input value={newJob.hospital} onChange={e => setNewJob(p => ({ ...p, hospital: e.target.value }))} placeholder="e.g. Barts Health NHS Trust" className="mt-1" /></div>
@@ -429,6 +454,127 @@ export default function AdminJobs() {
           </Tabs>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// Screenshot Drop Zone Component with AI Analysis
+function ScreenshotDropZone({ onExtracted }: { onExtracted: (data: any) => void }) {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const analyzeJob = trpc.ai.analyzeJobScreenshot.useMutation();
+
+  const processImage = useCallback(async (base64: string) => {
+    setPreview(base64);
+    setAnalyzing(true);
+    try {
+      const result = await analyzeJob.mutateAsync({ imageBase64: base64 });
+      if (result.success && result.data) {
+        onExtracted(result.data);
+      } else {
+        toast.error('Could not extract job details from this image. Please fill in manually.');
+      }
+    } catch (err) {
+      toast.error('AI analysis failed. Please fill in the fields manually.');
+    } finally {
+      setAnalyzing(false);
+    }
+  }, [analyzeJob, onExtracted]);
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const base64 = ev.target?.result as string;
+            processImage(base64);
+          };
+          reader.readAsDataURL(file);
+        }
+        break;
+      }
+    }
+  }, [processImage]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target?.result as string;
+        processImage(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, [processImage]);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target?.result as string;
+        processImage(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, [processImage]);
+
+  return (
+    <div
+      onPaste={handlePaste}
+      onDrop={handleDrop}
+      onDragOver={(e) => e.preventDefault()}
+      tabIndex={0}
+      className="relative border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-teal-400 transition-colors focus:border-teal-500 focus:outline-none cursor-pointer bg-gray-50"
+      onClick={() => !preview && fileInputRef.current?.click()}
+    >
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelect}
+      />
+
+      {analyzing && (
+        <div className="absolute inset-0 bg-white/90 rounded-xl flex flex-col items-center justify-center z-10">
+          <Loader2 className="w-8 h-8 text-teal-500 animate-spin mb-2" />
+          <p className="text-sm font-medium text-blue-900">AI is analyzing the screenshot...</p>
+          <p className="text-xs text-gray-500 mt-1">Extracting job details</p>
+        </div>
+      )}
+
+      {preview ? (
+        <div className="space-y-2">
+          <img src={preview} alt="Screenshot" className="max-h-32 mx-auto rounded-lg border shadow-sm" />
+          <button
+            onClick={(e) => { e.stopPropagation(); setPreview(null); }}
+            className="text-xs text-gray-500 hover:text-red-500 transition-colors"
+          >
+            Remove & paste another
+          </button>
+        </div>
+      ) : (
+        <div className="py-3">
+          <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+            <Wand2 className="w-6 h-6 text-teal-600" />
+          </div>
+          <p className="text-sm font-medium text-blue-900">Paste Screenshot to Auto-Fill</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Ctrl+V to paste • Drag & drop • Or click to upload
+          </p>
+          <p className="text-xs text-teal-600 mt-2 font-medium">
+            AI will extract job details automatically
+          </p>
+        </div>
+      )}
     </div>
   );
 }
