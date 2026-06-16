@@ -17,7 +17,7 @@ import { queueStore, JobSubmission } from '@/lib/appQueue';
 import { reviewStore, ResumeReviewRequest } from '@/lib/resumeReview';
 import {
   CheckCircle, AlertCircle, FileText, MessageSquare, Upload, Clock,
-  ArrowRight, User, ChevronRight, Download, X, Loader2, Bell, CalendarCheck
+  ArrowRight, User, ChevronRight, Download, X, Loader2, Bell, CalendarCheck, Briefcase
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -237,6 +237,9 @@ export default function Dashboard() {
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="jobs">
+              {lang === 'ar' ? 'وظائف لك' : 'Jobs For You'}
             </TabsTrigger>
             <TabsTrigger value="documents">{t('dashboard.documentsTab')}</TabsTrigger>
           </TabsList>
@@ -512,6 +515,71 @@ export default function Dashboard() {
                 viewerRole="user"
                 onUpdate={(updated) => setApplication(updated)}
               />
+            </div>
+          </TabsContent>
+
+          {/* Jobs For You Tab */}
+          <TabsContent value="jobs">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-serif text-xl text-navy">
+                  {lang === 'ar' ? 'وظائف مقترحة لك' : 'Jobs Suggested For You'}
+                </h2>
+              </div>
+              {(() => {
+                const { jobMgmt } = require('@/lib/jobManagement');
+                const sharedJobs = jobMgmt.getSharedJobsForDoctor(user?.id || '');
+                if (sharedJobs.length === 0) return (
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="p-8 text-center">
+                      <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500">{lang === 'ar' ? 'لا توجد وظائف مقترحة حالياً. فريقنا يبحث عن الفرص المناسبة لك.' : 'No jobs suggested yet. Our team is searching for suitable opportunities for you.'}</p>
+                    </CardContent>
+                  </Card>
+                );
+                return sharedJobs.map((sj: any) => (
+                  <Card key={sj.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-blue-900">{sj.job?.title || 'Job'}</h3>
+                            <Badge className={`text-xs ${
+                              sj.status === 'New' ? 'bg-blue-100 text-blue-700' :
+                              sj.status === 'Applied' ? 'bg-green-100 text-green-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {sj.status === 'New' ? (lang === 'ar' ? 'جديد' : 'New') :
+                               sj.status === 'Applied' ? (lang === 'ar' ? 'تم التقديم' : 'Applied') :
+                               sj.status}
+                            </Badge>
+                            {sj.applicationStatus && (
+                              <Badge className="text-xs bg-teal-100 text-teal-700">{sj.applicationStatus}</Badge>
+                            )}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            {sj.job?.hospital} • {sj.job?.location}
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <Badge variant="outline" className="text-xs">{sj.job?.specialty}</Badge>
+                            <Badge variant="outline" className="text-xs">{sj.job?.rank}</Badge>
+                            {sj.job?.salaryRange && <Badge className="text-xs bg-blue-50 text-blue-700 border-0">{sj.job.salaryRange}</Badge>}
+                          </div>
+                          {sj.job?.description && (
+                            <p className="text-sm text-gray-600 mt-3 line-clamp-2">{sj.job.description}</p>
+                          )}
+                        </div>
+                      </div>
+                      {sj.applicationStatus && (
+                        <div className="mt-3 pt-3 border-t text-sm text-gray-500">
+                          {lang === 'ar' ? 'حالة التقديم:' : 'Application Status:'} <strong className="text-blue-900">{sj.applicationStatus}</strong>
+                          {sj.applicationNotes && <span className="ml-2 text-gray-400">— {sj.applicationNotes}</span>}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ));
+              })()}
             </div>
           </TabsContent>
 

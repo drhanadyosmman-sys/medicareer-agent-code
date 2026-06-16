@@ -2,7 +2,7 @@ import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   Users, Globe, CreditCard, LayoutDashboard, Briefcase, Send,
-  Database, Bell, Menu, X, ChevronRight
+  Database, Bell, Menu, X, ChevronRight, ClipboardList
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: '/admin/queue', label: 'Application Queue', icon: Send },
   { href: '/admin/job-engine', label: 'Job Collection', icon: Database },
   { href: '/admin/follow-up', label: 'Follow-up Tracker', icon: Bell },
+  { href: '/admin/jobs', label: 'Jobs Management', icon: ClipboardList },
   { href: '/admin/countries', label: 'Countries', icon: Globe },
   { href: '/admin/pricing', label: 'Pricing', icon: CreditCard },
 ];
