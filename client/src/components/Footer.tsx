@@ -42,9 +42,37 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-white/40">© {new Date().getFullYear()} MediCareer Agent. {t('footer.copyright')}</p>
-          <p className="text-xs text-white/40">{t('footer.disclaimer')}</p>
+        {/* TMLA Company Registration */}
+        <div className="border-t border-white/10 mt-12 pt-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <span className="font-serif text-lg text-amber-400 font-bold">TMLA</span>
+              </div>
+            </div>
+            <ul className="space-y-1.5 text-xs text-white/50">
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
+                Registered in the Kingdom of Saudi Arabia
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
+                Commercial Registration (CR): 7053685355
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
+                Licensed by the Ministry of Investment of Saudi Arabia (MISA)
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
+                Wholly Owned by TMLA Group Handelsbolag (Sweden)
+              </li>
+            </ul>
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-white/5">
+            <p className="text-xs text-white/40">© {new Date().getFullYear()} MediCareer Agent. {t('footer.copyright')}</p>
+            <p className="text-xs text-white/40">{t('footer.disclaimer')}</p>
+          </div>
         </div>
       </div>
     </footer>
