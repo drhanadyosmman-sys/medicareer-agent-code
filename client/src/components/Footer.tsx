@@ -1,77 +1,129 @@
 import { Link } from 'wouter';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const LOGO_URL = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663502631447/3tsQVrLUcXjTB9oAq7mMW6/medicareer-logo-42Zj2vUEyBmUToQiEzq5VB.webp';
-
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
-    <footer className="bg-navy text-white/80">
+    <footer style={{ backgroundColor: '#0a1628' }} className="text-white">
+      {/* Main footer content */}
       <div className="container py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <img src={LOGO_URL} alt="MediCareer Agent" className="h-8 w-8" />
-              <span className="font-serif text-lg text-white">MediCareer<span className="text-teal">Agent</span></span>
+              <div className="w-9 h-9 bg-teal-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">M</span>
+              </div>
+              <span className="font-serif text-lg text-white">
+                MediCareer<span className="text-teal-400">Agent</span>
+              </span>
             </div>
-            <p className="text-sm text-white/60 leading-relaxed">{t('footer.desc')}</p>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              {lang === 'ar'
+                ? 'دعم مهني لمسيرتك الطبية في بريطانيا. نساعدك على الحصول على وظيفة في نظام الـ NHS.'
+                : 'Professional medical career support. We help doctors secure positions in the UK healthcare system.'}
+            </p>
           </div>
+
+          {/* Services */}
           <div>
-            <h4 className="font-sans text-sm font-semibold text-white mb-4 uppercase tracking-wider">{t('footer.services')}</h4>
+            <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
+              {lang === 'ar' ? 'الخدمات' : 'Services'}
+            </h4>
             <ul className="space-y-2.5">
-              <li><Link href="/uk-doctors" className="text-sm text-white/60 hover:text-teal transition-colors">{t('nav.ukDoctorJobs')}</Link></li>
-              <li><Link href="/pathways" className="text-sm text-white/60 hover:text-teal transition-colors">{t('footer.allPathways')}</Link></li>
-              <li><Link href="/pricing" className="text-sm text-white/60 hover:text-teal transition-colors">{t('nav.pricing')}</Link></li>
-              <li><Link href="/apply" className="text-sm text-white/60 hover:text-teal transition-colors">{t('footer.startAssessment')}</Link></li>
+              <li>
+                <Link href="/uk-doctors">
+                  <span className="text-sm cursor-pointer hover:text-teal-400 transition-colors" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    {lang === 'ar' ? 'وظائف بريطانيا' : 'UK Doctor Jobs'}
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/pathways">
+                  <span className="text-sm cursor-pointer hover:text-teal-400 transition-colors" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    {lang === 'ar' ? 'المسارات المهنية' : 'Career Pathways'}
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing">
+                  <span className="text-sm cursor-pointer hover:text-teal-400 transition-colors" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    {lang === 'ar' ? 'الأسعار' : 'Pricing'}
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/apply">
+                  <span className="text-sm cursor-pointer hover:text-teal-400 transition-colors" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    {lang === 'ar' ? 'ابدأ التقييم' : 'Start Assessment'}
+                  </span>
+                </Link>
+              </li>
             </ul>
           </div>
+
+          {/* Resources */}
           <div>
-            <h4 className="font-sans text-sm font-semibold text-white mb-4 uppercase tracking-wider">{t('footer.resources')}</h4>
+            <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
+              {lang === 'ar' ? 'الموارد' : 'Resources'}
+            </h4>
             <ul className="space-y-2.5">
-              <li><span className="text-sm text-white/40">{t('footer.careerGuides')}</span></li>
-              <li><span className="text-sm text-white/40">{t('footer.applicationTips')}</span></li>
-              <li><span className="text-sm text-white/40">{t('footer.interviewPrep')}</span></li>
+              <li><span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{lang === 'ar' ? 'أدلة المسيرة المهنية' : 'Career Guides'}</span></li>
+              <li><span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{lang === 'ar' ? 'نصائح التقديم' : 'Application Tips'}</span></li>
+              <li><span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{lang === 'ar' ? 'التحضير للمقابلة' : 'Interview Prep'}</span></li>
             </ul>
           </div>
+
+          {/* Contact */}
           <div>
-            <h4 className="font-sans text-sm font-semibold text-white mb-4 uppercase tracking-wider">{t('footer.contact')}</h4>
+            <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
+              {lang === 'ar' ? 'تواصل معنا' : 'Contact'}
+            </h4>
             <ul className="space-y-2.5">
-              <li className="text-sm text-white/60">support@medicareeragent.com</li>
-              <li className="text-sm text-white/60">London, United Kingdom</li>
+              <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>support@medicareeragent.com</li>
+              <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>London, United Kingdom</li>
             </ul>
           </div>
         </div>
+
         {/* TMLA Company Registration */}
-        <div className="border-t border-white/10 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center">
-                <span className="font-serif text-lg text-amber-400 font-bold">TMLA</span>
+        <div className="mt-12 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <div className="flex flex-col md:flex-row items-start gap-6 mb-6">
+            {/* TMLA Logo Text */}
+            <div className="flex-shrink-0">
+              <div className="px-3 py-1.5 rounded border" style={{ borderColor: 'rgba(251,191,36,0.3)', backgroundColor: 'rgba(251,191,36,0.05)' }}>
+                <span className="font-serif font-bold text-base" style={{ color: '#f59e0b' }}>TMLA</span>
               </div>
             </div>
-            <ul className="space-y-1.5 text-xs text-white/50">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
-                Registered in the Kingdom of Saudi Arabia
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
-                Commercial Registration (CR): 7053685355
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
-                Licensed by the Ministry of Investment of Saudi Arabia (MISA)
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full"></span>
-                Wholly Owned by TMLA Group Handelsbolag (Sweden)
-              </li>
+
+            {/* Registration Details */}
+            <ul className="space-y-2">
+              {[
+                lang === 'ar' ? 'مسجلة في المملكة العربية السعودية' : 'Registered in the Kingdom of Saudi Arabia',
+                lang === 'ar' ? 'السجل التجاري (CR): 7053685355' : 'Commercial Registration (CR): 7053685355',
+                lang === 'ar' ? 'مرخصة من وزارة الاستثمار في المملكة العربية السعودية (MISA)' : 'Licensed by the Ministry of Investment of Saudi Arabia (MISA)',
+                lang === 'ar' ? 'مملوكة بالكامل لـ TMLA Group Handelsbolag (السويد)' : 'Wholly Owned by TMLA Group Handelsbolag (Sweden)',
+              ].map((item, i) => (
+                <li key={i} className="flex items-center gap-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#f59e0b', opacity: 0.7 }}></span>
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-white/5">
-            <p className="text-xs text-white/40">© {new Date().getFullYear()} MediCareer Agent. {t('footer.copyright')}</p>
-            <p className="text-xs text-white/40">{t('footer.disclaimer')}</p>
+
+          {/* Copyright */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              © {new Date().getFullYear()} MediCareer Agent.{' '}
+              {lang === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}
+            </p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              {lang === 'ar'
+                ? 'هذه الخدمة لا تضمن التوظيف.'
+                : 'This service does not guarantee employment.'}
+            </p>
           </div>
         </div>
       </div>
