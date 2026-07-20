@@ -15,5 +15,11 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
+    env: {
+      // Session signing refuses to run without a key; give the suite a fixed one.
+      JWT_SECRET: "test-only-secret-not-used-anywhere-else",
+      VITE_APP_ID: "medicareer-agent-test",
+      ADMIN_EMAILS: "owner@example.com, Second.Admin@Example.com",
+    },
   },
 });

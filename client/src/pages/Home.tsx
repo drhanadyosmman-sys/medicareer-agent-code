@@ -4,7 +4,7 @@ import { Link } from 'wouter';
 import { ArrowRight, CheckCircle, Users, FileText, Target, Headphones } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { FadeUp, SlideLeft, SlideRight, ScaleUp, AnimatedCounter, StaggerContainer, StaggerItem, FloatingElement } from '@/components/ScrollAnimations';
+import { FadeUp, SlideLeft, SlideRight, FloatingElement } from '@/components/ScrollAnimations';
 
 // Verified high-quality Unsplash images
 const IMAGES = {
@@ -131,29 +131,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ===== STATS BAR ===== */}
-      <section className="relative -mt-16 z-20">
-        <div className="container">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 border border-gray-100">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {[
-                { value: 500, suffix: '+', label: lang === 'ar' ? 'طبيب ساعدناهم' : 'Doctors Helped' },
-                { value: 92, suffix: '%', label: lang === 'ar' ? 'نسبة القبول' : 'Success Rate' },
-                { value: 150, suffix: '+', label: lang === 'ar' ? 'مستشفى NHS' : 'NHS Trusts' },
-                { value: 48, suffix: 'h', label: lang === 'ar' ? 'وقت المراجعة' : 'Review Time' },
-              ].map((stat, i) => (
-                <div key={i}>
-                  <div className="font-serif text-4xl md:text-5xl font-bold text-blue-900">
-                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                  </div>
-                  <div className="text-gray-500 mt-2 text-sm font-medium">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ===== HOW IT WORKS ===== */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="container">
@@ -214,7 +191,9 @@ export default function Home() {
                 {lang === 'ar' ? 'مستقبلك المهني يبدأ هنا' : 'Your Career Starts Here'}
               </h2>
               <p className="text-xl text-white/80 max-w-2xl">
-                {lang === 'ar' ? 'أكثر من ١٥٠ مستشفى NHS في جميع أنحاء المملكة المتحدة بانتظار طبيب مثلك' : 'Over 150 NHS Trusts across the United Kingdom are waiting for doctors like you'}
+                {lang === 'ar'
+                  ? 'نحن نبحث عن الوظائف المناسبة لك في الـ NHS، ونجهّز طلبك، ونتقدّم نيابةً عنك'
+                  : 'We find suitable NHS roles, prepare your application, and apply on your behalf'}
               </p>
             </FadeUp>
           </div>
@@ -232,14 +211,6 @@ export default function Home() {
                   alt="Medical team"
                   className="rounded-2xl shadow-2xl w-full h-[500px] object-cover"
                 />
-                <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-6 max-w-[200px]">
-                  <div className="font-serif text-3xl font-bold text-teal-600">
-                    <AnimatedCounter target={92} suffix="%" />
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {lang === 'ar' ? 'نسبة النجاح' : 'Success Rate'}
-                  </div>
-                </div>
               </div>
             </SlideLeft>
 
@@ -274,52 +245,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
-      <section className="py-24 lg:py-32 bg-white">
-        <div className="container">
-          <FadeUp className="max-w-3xl mx-auto text-center mb-16">
-            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
-            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
-              {t('home.testimonialsTitle')}
-            </h2>
-            <p className="text-xl text-gray-600">
-              {t('home.testimonialsDesc')}
-            </p>
-          </FadeUp>
-
-          <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15}>
-            {[
-              { text: t('home.testimonial1'), img: IMAGES.doctors },
-              { text: t('home.testimonial2'), img: IMAGES.success },
-              { text: t('home.testimonial3'), img: IMAGES.interview },
-            ].map((testimonial, i) => (
-              <StaggerItem key={i}>
-                <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, j) => (
-                      <span key={j} className="text-amber-400 text-lg">★</span>
-                    ))}
-                  </div>
-                  <p className="text-gray-700 leading-relaxed mb-6 italic">
-                    "{testimonial.text}"
-                  </p>
-                  <div className="flex items-center gap-3 mt-auto">
-                    <img src={testimonial.img} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-teal-200" />
-                    <div>
-                      <div className="font-semibold text-blue-900 text-sm">
-                        {lang === 'ar' ? 'طبيب متخصص' : 'Medical Professional'}
-                      </div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
-                        🇬🇧 NHS Doctor
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
+      {/* Testimonials removed: the service has not yet worked with any doctor, so
+          there are no real success stories to show. Re-add this section once
+          there are genuine, attributable ones - fabricated reviews are unlawful
+          under the UK's consumer protection rules, not merely inadvisable. */}
 
       {/* ===== HOSPITAL IMAGE BREAK ===== */}
       <section className="relative h-[350px] overflow-hidden">

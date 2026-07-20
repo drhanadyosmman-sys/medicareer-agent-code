@@ -1,10 +1,11 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
+import { ReactNode, useEffect } from "react";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -27,8 +28,32 @@ import AdminFollowUp from "./pages/admin/AdminFollowUp";
 import AdminJobs from "./pages/admin/AdminJobs";
 import { useLocation } from "wouter";
 
+/**
+ * Gate for the /admin/* routes.
+ *
+ * NOTE: this is a UI guard, not security. Auth currently lives entirely in the
+ * browser (see lib/store.ts), so a determined visitor can still edit localStorage
+ * and get in. It stops casual access and gives us the right shape to hang real
+ * server-side checks off once the backend exists — at that point this should
+ * switch to the `useAuth` hook in _core/hooks, which reads the httpOnly session
+ * cookie via trpc.auth.me, and the server must enforce `adminProcedure` too.
+ */
+function RequireAdmin({ children }: { children: ReactNode }) {
+  const { isAdmin, isAuthenticated, loading } = useAuth();
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    // Wait for the session check to resolve; redirecting while it is still in
+    // flight would bounce a legitimate admin out on every page load.
+    if (loading) return;
+    if (!isAuthenticated || !isAdmin) navigate('/login', { replace: true });
+  }, [loading, isAuthenticated, isAdmin, navigate]);
+
+  if (loading || !isAuthenticated || !isAdmin) return null;
+  return <>{children}</>;
+}
+
 function AdminRoutes() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <AdminLayout>
       <Switch>
@@ -63,8 +88,12 @@ function Router() {
         <Route path="/apply" component={Apply} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/checkout" component={Checkout} />
-        <Route path="/admin/:rest*" component={AdminRoutes} />
-        <Route path="/admin" component={AdminRoutes} />
+        <Route path="/admin/:rest*">
+          <RequireAdmin><AdminRoutes /></RequireAdmin>
+        </Route>
+        <Route path="/admin">
+          <RequireAdmin><AdminRoutes /></RequireAdmin>
+        </Route>
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

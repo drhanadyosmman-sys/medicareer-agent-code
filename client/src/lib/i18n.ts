@@ -82,17 +82,14 @@ export const translations: Record<string, Record<string, Record<Language, string
     reason1Desc: { en: 'We know exactly what NHS trusts are looking for and how to position your profile.', ar: 'نعرف بالضبط ما يبحث عنه الـ NHS، وكيف نعرض ملفك بأفضل صورة.' },
     reason2Title: { en: 'Time Saved', ar: 'توفير وقتك' },
     reason2Desc: { en: 'No more endless job searches and application forms. We find and apply to suitable roles for you.', ar: 'لا مزيد من البحث المرهق عن الوظائف. نحن نجد الفرص المناسبة ونقدم لك عليها.' },
-    reason3Title: { en: 'Higher Success Rate', ar: 'نسبة نجاح أعلى' },
-    reason3Desc: { en: 'Our tailored approach significantly increases your chances of being shortlisted for interviews.', ar: 'نهجنا المتخصص يزيد بشكل ملحوظ من فرصك في الترشيح للمقابلات.' },
+    reason3Title: { en: 'Matched to the Person Specification', ar: 'مطابقة لمواصفات الوظيفة' },
+    reason3Desc: { en: 'Every application is written against the specific person specification for that role, not sent as a generic CV.', ar: 'كل طلب يُكتب وفقاً لمواصفات الوظيفة المحددة، وليس سيرة ذاتية عامة تُرسل للجميع.' },
     reason4Title: { en: 'Full Support', ar: 'دعم شامل' },
     reason4Desc: { en: 'From CV to interview, we are with you every step of the way until you secure a position.', ar: 'من السيرة الذاتية إلى المقابلة، نرافقك في كل خطوة حتى تحصل على الوظيفة.' },
 
-    // Testimonials
-    testimonialsTitle: { en: 'Success Stories', ar: 'قصص النجاح' },
-    testimonialsDesc: { en: 'Hear from doctors who have secured positions through our service.', ar: 'اسمع من الأطباء الذين حصلوا على وظائفهم من خلالنا.' },
-    testimonial1: { en: 'I was applying for months with no success. MediCareer Agent completely transformed my CV and within 6 weeks, I had 3 interview offers. Highly recommended.', ar: 'كنت أتقدم على الوظائف لأشهر بدون نتيجة. فريق MediCareer غيّر سيرتي الذاتية بالكامل، وفي غضون ستة أسابيع، حصلت على 3 عروض مقابلات. أنصح به بشدة.' },
-    testimonial2: { en: 'The team understood exactly what I needed. They not only improved my application but also prepared me thoroughly for the interview. I got the job!', ar: 'الفريق فهم احتياجاتي بدقة. لم يحسّنوا طلبي فقط، بل جهّزوني بشكل شامل للمقابلة. حصلت على الوظيفة!' },
-    testimonial3: { en: 'As an IMG, I was worried about competing with UK graduates. MediCareer Agent showed me how to highlight my unique strengths. Now I work at a leading NHS trust.', ar: 'كطبيب متخرج من الخارج، كنت قلقاً من المنافسة. فريق MediCareer علّمني كيف أبرز نقاط قوتي الفريدة. الآن أعمل في أحد أكبر مستشفيات الـ NHS.' },
+    // Testimonials: intentionally removed. The three that were here were written
+    // for a service that has not yet worked with any doctor. Add real, attributable
+    // ones when they exist - and keep the doctor's own wording and consent.
 
     // FAQ
     faqTitle: { en: 'Frequently Asked Questions', ar: 'الأسئلة الشائعة' },
@@ -111,7 +108,7 @@ export const translations: Record<string, Record<string, Record<Language, string
 
     // CTA Final
     ctaFinalTitle: { en: 'Ready to Launch Your UK Medical Career?', ar: 'هل أنت مستعد لبدء مسيرتك الطبية في بريطانيا؟' },
-    ctaFinalDesc: { en: 'Join hundreds of doctors who have successfully secured NHS positions. Start your assessment today.', ar: 'انضم إلى مئات الأطباء الذين حصلوا على وظائفهم في الـ NHS. ابدأ تقييمك اليوم.' },
+    ctaFinalDesc: { en: 'Send us your CV and we will tell you honestly where you stand and what to do next. Start your assessment today.', ar: 'أرسل لنا سيرتك الذاتية وسنخبرك بصراحة أين أنت وما الخطوة التالية. ابدأ تقييمك اليوم.' },
     beginAssessment: { en: 'Begin Your Assessment', ar: 'ابدأ التقييم الآن' },
     learnMore: { en: 'Learn More', ar: 'تعرف على المزيد' },
   },

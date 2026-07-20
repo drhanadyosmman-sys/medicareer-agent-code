@@ -2,7 +2,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
 import { ArrowRight, CheckCircle } from 'lucide-react';
-import { FadeUp, SlideLeft, SlideRight, StaggerContainer, StaggerItem, AnimatedCounter } from '@/components/ScrollAnimations';
+import { FadeUp, SlideLeft, SlideRight, StaggerContainer, StaggerItem } from '@/components/ScrollAnimations';
 
 const IMAGES = {
   hero: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1400&q=80', // Hospital corridor
@@ -78,26 +78,13 @@ export default function UKDoctors() {
         <div className="absolute inset-0 flex items-end">
           <div className="container pb-12">
             <FadeUp>
-              <div className="grid grid-cols-3 gap-8 max-w-lg">
-                <div className="text-center">
-                  <div className="font-serif text-3xl font-bold text-white">
-                    <AnimatedCounter target={150} suffix="+" />
-                  </div>
-                  <div className="text-white/70 text-sm mt-1">NHS Trusts</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-serif text-3xl font-bold text-white">
-                    <AnimatedCounter target={500} suffix="+" />
-                  </div>
-                  <div className="text-white/70 text-sm mt-1">{lang === 'ar' ? 'طبيب' : 'Doctors'}</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-serif text-3xl font-bold text-white">
-                    <AnimatedCounter target={92} suffix="%" />
-                  </div>
-                  <div className="text-white/70 text-sm mt-1">{lang === 'ar' ? 'نجاح' : 'Success'}</div>
-                </div>
-              </div>
+              {/* Track-record figures removed - the service has not yet placed any
+                  doctor, so there is nothing real to count. */}
+              <p className="text-xl text-white/80 max-w-2xl">
+                {lang === 'ar'
+                  ? 'من مراجعة سيرتك الذاتية إلى التحضير للمقابلة — نرافقك في كل خطوة'
+                  : 'From CV review to interview preparation — we are with you at every step'}
+              </p>
             </FadeUp>
           </div>
         </div>

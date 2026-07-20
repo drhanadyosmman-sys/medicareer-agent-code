@@ -81,7 +81,9 @@ export default function Footer() {
               {lang === 'ar' ? 'تواصل معنا' : 'Contact'}
             </h4>
             <ul className="space-y-2.5">
-              <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>support@medicareeragent.com</li>
+              <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <a href="mailto:support@hcqsai.uk" style={{ color: 'inherit' }}>support@hcqsai.uk</a>
+              </li>
               <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>London, United Kingdom</li>
             </ul>
           </div>
