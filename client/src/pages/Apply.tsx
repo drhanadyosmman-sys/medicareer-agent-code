@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -125,6 +126,9 @@ export default function Apply() {
     }
   };
 
+  const sendWelcome = trpc.email.sendWelcome.useMutation();
+  const sendAppConfirmation = trpc.email.sendApplicationConfirmation.useMutation();
+
   const handleSubmit = () => {
     if (!form.consent1 || !form.consent2 || !form.consent3) {
       toast.error('Please accept all consent checkboxes');
@@ -188,6 +192,11 @@ export default function Apply() {
     const planId = urlParams.get('plan') || 'standard';
     const planName = urlParams.get('planName') || 'Standard Package';
     const price = urlParams.get('price') || '299';
+    // Send emails (fire-and-forget, don't block UI)
+    if (form.email) {
+      sendWelcome.mutate({ to: form.email, name: form.fullName });
+      sendAppConfirmation.mutate({ to: form.email, name: form.fullName, applicationId: appId });
+    }
     toast.success(lang === 'ar' ? 'تم إرسال الطلب! جاري التحويل للدفع...' : 'Application submitted! Redirecting to payment...');
     setTimeout(() => navigate(`/checkout?plan=${planId}&planName=${encodeURIComponent(planName)}&price=${price}`), 1000);
   };

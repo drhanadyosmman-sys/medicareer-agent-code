@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { store, Message, DoctorApplication } from '@/lib/store';
+import { trpc } from '@/lib/trpc';
 import { Send, CheckCheck, Check } from 'lucide-react';
 
 interface ChatPanelProps {
@@ -74,24 +75,32 @@ export default function ChatPanel({ application, viewerRole, onUpdate, compact =
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const sendMessageNotification = trpc.email.sendMessageNotification.useMutation();
+
   const sendMessage = () => {
     if (!newMessage.trim() || sending) return;
     setSending(true);
-
+    const msgContent = newMessage.trim();
     const msg: Message = {
       id: `msg-${Date.now()}`,
       from: viewerRole,
-      content: newMessage.trim(),
+      content: msgContent,
       createdAt: new Date().toISOString(),
       read: false,
     };
-
     const updatedMessages = [...messages, msg];
     store.updateApplication(application.id, { messages: updatedMessages });
     setMessages(updatedMessages);
     setNewMessage('');
     setSending(false);
-
+    // If admin sends a message, notify the doctor by email
+    if (viewerRole === 'admin' && application.email) {
+      sendMessageNotification.mutate({
+        to: application.email,
+        name: application.fullName,
+        messagePreview: msgContent.slice(0, 200) + (msgContent.length > 200 ? '...' : ''),
+      });
+    }
     if (onUpdate) {
       onUpdate({ ...application, messages: updatedMessages });
     }

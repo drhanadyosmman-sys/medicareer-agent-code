@@ -72,6 +72,8 @@ export default function AdminJobs() {
     toast.success('Job added successfully');
   };
 
+  const sendJobShared = trpc.email.sendJobShared.useMutation();
+
   const handleShareJob = () => {
     if (!selectedJob || selectedDoctors.length === 0) return;
     const doctorsToShare = doctors.filter(d => selectedDoctors.includes(d.id));
@@ -79,6 +81,20 @@ export default function AdminJobs() {
     setSharedJobs(jobMgmt.getSharedJobs());
     setShowShareDialog(false);
     setSelectedDoctors([]);
+    // Send email notification to each doctor
+    const allApps = store.getApplications();
+    doctorsToShare.forEach(doctor => {
+      const app = allApps.find(a => a.userId === doctor.id);
+      if (app?.email) {
+        sendJobShared.mutate({
+          to: app.email,
+          name: app.fullName,
+          jobTitle: selectedJob.title,
+          hospital: selectedJob.hospital,
+          location: selectedJob.location,
+        });
+      }
+    });
     toast.success(`Job shared with ${doctorsToShare.length} doctor(s)`);
   };
 
