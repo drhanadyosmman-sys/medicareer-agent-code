@@ -1,203 +1,149 @@
-# MediCareer Agent — work done 19 July 2026
+# MediCareer Agent — status
 
-Everything below is **committed locally only**. Nothing has been published to
-agent.tmla.com.sa — there is no deployment path from this machine (no deploy script,
-no git remote, no Manus CLI). The final Publish has to come from your Manus account.
+Last updated 20 July 2026. This branch (`apply-fixes`) is verified but **not yet merged
+or deployed**. The live site still runs the old build.
 
-Verified green: `tsc --noEmit` passes, **49 tests** pass, `vite build` succeeds.
+Verified on this exact tree: `tsc --noEmit` passes, **78 tests** pass, `vite build`
+succeeds, and the app was driven in a browser.
 
 ---
 
-## The headline: your doctor dashboard was completely broken in production
+## The headline: the doctor dashboard was dead in production
 
-Any doctor who logged in and opened `/dashboard` got a full-page error:
+Every doctor who signed in and opened `/dashboard` got a full-page error instead:
 
 ```
 ReferenceError: require is not defined
 ```
 
-`Dashboard.tsx` called `require('@/lib/jobManagement')` inside a render function.
-`require` does not exist in a browser bundle, so the whole page threw and the error
-boundary replaced it. Confirmed live on the production site, then fixed and verified.
+`Dashboard.tsx` called `require('@/lib/jobManagement')` inside a render function. There is
+no `require` in a browser ESM bundle, so the whole page threw and the error boundary
+replaced it. Confirmed live, then fixed and verified.
 
-This is almost certainly the "problem" you were seeing. It made the core product
-unusable for every logged-in doctor.
-
----
-
-## Part 1 — Bugs fixed
-
-| Fix | Severity |
-|-----|----------|
-| Doctor dashboard crash (`require is not defined`) | **Critical** — page was dead |
-| Restored `client/src/lib/jobManagement.ts`, missing from the export | **Critical** — could not build |
-| Restored `client/src/_core/hooks/useAuth.ts`, missing from the export | High |
-| `/admin` was open to anyone who typed the URL | High |
-| Returning applicants' applications were orphaned under a fake user id | High |
-| Login page displayed working admin credentials (`admin123`) | Medium |
-| Broken character in the page `<title>` | Low |
-
-### The two missing files
-
-The zip you downloaded from Manus is missing `jobManagement.ts` — the export itself is
-incomplete, so re-downloading will not help. I reconstructed it from your live
-JavaScript bundle; `/admin/jobs` renders identically to production and the build output
-matches production size to within 0.4%. `useAuth.ts` came from your `medpath-uk`
-project, which uses the same template.
-
-**If you can get the real `jobManagement.ts` out of the Manus editor, send it** — mine
-is faithful but reconstructed.
+If something felt broken about the site, this was almost certainly it.
 
 ---
 
-## Part 2 — The backend (new)
+## What this branch changes
 
-The app previously stored everything in the visitor's own browser, so nothing a doctor
-submitted ever reached you. There is now a real server side.
-
-### Database
-
-`drizzle/0001_purple_magdalene.sql` — **additive**. It creates four new tables
-(`applications`, `documents`, `messages`, `adminNotes`) and only *alters* `users` to add
-`passwordHash` and a unique index on `email`. Your existing `users` table and its rows
-are untouched.
-
-### Authentication
-
-Email + password, over tRPC: `auth.register`, `auth.login`, `auth.logout`, `auth.me`.
-
-- Passwords hashed with **scrypt** from Node's standard library — no native dependency
-  to build, nothing extra to install.
-- Login hashes a dummy value when the email is unknown, so a wrong email and a wrong
-  password take the same time and return the same message. Neither reveals whether an
-  account exists.
-- The session is a signed JWT in an **httpOnly cookie**. Identity now comes from the
-  server; editing browser storage no longer makes you an admin.
-- Issuing a session **refuses to run if `JWT_SECRET` is unset**, rather than quietly
-  signing with an empty key that anyone could forge.
-
-### Applications API
-
-Doctors read and write only their own application. Every per-application procedure goes
-through a single ownership check, and another user's application is reported as "not
-found" — identical to a genuinely missing one, so ids cannot be probed.
-
-Admin-only: status changes, readiness guidance, and internal notes. **Internal notes are
-never returned to a doctor.** A message's sender is taken from the session, not the
-request body, so a doctor cannot post a message that appears to come from a consultant.
-
-### Tests
-
-49 passing, covering password hashing, timing-equal login, ownership boundaries,
-admin-only access, and internal-note leakage. I checked the suite is actually meaningful
-by deleting the ownership check and confirming exactly the five relevant tests failed.
-
----
-
-## Sign-in links (no passwords to forget)
-
-A doctor who applies never has to remember a password. They enter their email, we send
-a one-time sign-in link, they click it, they are in.
-
-- The link is a 256-bit random secret. Only its **SHA-256 is stored**, so reading the
-  database does not yield working links — there is a test asserting the stored hash
-  cannot be used as a token.
-- **Works once.** Redeeming clears it, so a forwarded or re-clicked link is dead.
-  Verified by deleting that line and confirming the test fails.
-- **Expires in 15 minutes.**
-- Requesting a new link invalidates the previous one.
-- Asking for a link reports success **whether or not the address has an account** — the
-  page must not become a way to check which doctors are registered with you.
-
-Failed links land back on `/login` with a plain explanation, never a stack trace.
-
----
-
-## To make this live — three things, in order
-
-**1. Set environment variables in Manus**
-
-| Variable | Value |
+| Fix | Why it mattered |
 |---|---|
-| `DATABASE_URL` | your MySQL connection string |
-| `JWT_SECRET` | a long random string — this signs session cookies |
-| `ADMIN_EMAILS` | **your email**, e.g. `healthcarequalityschool@gmail.com` |
-| `RESEND_API_KEY` | from your Resend account — sends the sign-in links |
-| `EMAIL_FROM` | e.g. `MediCareer Agent <no-reply@hcqsai.uk>` |
+| Dashboard crash (`require is not defined`) | Core product page was unusable |
+| `/admin` open to anyone who typed the URL | The scaffold left a "consider authentication" comment and no guard |
+| Removed unsubstantiated success claims | 500+/92%/150+/48h stats, plus three invented testimonials |
+| Support email pointed at a dead domain | `medicareeragent.com` has no MX — every support email bounced |
+| Page title rendered as `?` | See below — the cause was not what it looked like |
+| **New: real backend** | Nothing a doctor submitted previously reached the business |
 
-`ADMIN_EMAILS` matters: roles default to `user`, and only an admin can grant admin — so
-without it **nobody can reach `/admin`**, including you. Any email listed here is
-promoted to admin when it registers or signs in. It never demotes anyone.
+### The title bug was an encoding fault, not a typo
 
-On `EMAIL_FROM`: your Resend account has three verified domains — `hcqs.ai`,
-`hcqscongress.com`, `hcqsai.uk`. None matches `tmla.com.sa` or `medicareeragent.com`.
-`hcqsai.uk` is the closest fit, but **sending sign-in links from a domain unrelated to
-the site hurts both deliverability and trust** — a doctor sees a link from an unfamiliar
-sender. Worth verifying a matching domain in Resend before launch.
+`client/index.html` was saved in **Windows-1252** while declaring `charset=UTF-8`. The em
+dash was a lone `0x97` byte, which is invalid UTF-8, so browsers substituted the
+replacement character. The source *looked* correct in most editors, which is why it
+survived. Re-encoded as real UTF-8. A scan of every `.ts/.tsx/.html/.json/.css/.md` file
+found this was the **only** affected file.
 
-Without `RESEND_API_KEY`, everything else still works; link requests are logged as
-skipped instead of sent, so nothing crashes in development.
+### The backend
 
-**2. Run the migrations** — `pnpm db:push`, or apply `0001_purple_magdalene.sql` then
-`0002_lively_madame_hydra.sql`. Both are additive.
+- **Tables:** `applications`, `documents`, `messages`, `adminNotes`; `users` gains
+  `passwordHash` and login-link columns. Migrations `0001` and `0002` are additive and
+  sit on top of the existing `0000_sturdy_stick`, which stays untouched.
+- **Registration/login:** email + password, scrypt hashed. Login does equal work for an
+  unknown email as for a wrong password, so it cannot be used to find out who is
+  registered.
+- **Email sign-in links:** one-time, 15-minute expiry, stored only as SHA-256. This
+  replaces accounts created with `'temp' + Date.now()` passwords that no doctor was ever
+  shown and could never reset.
+- **Authorisation:** a doctor can reach only their own application; internal notes never
+  leave the admin side; a message's sender comes from the session, not the request body.
 
-One caveat: `0001` adds a unique index on `users.email`. If your `users` table already
-contains two rows with the same email, that statement fails and you will need to clear
-the duplicate first. With no real users yet this should be fine.
-
-**3. Register your own account** on the live site with the email you put in
-`ADMIN_EMAILS`. That becomes your admin login, replacing `admin123`.
+Test quality was checked by breaking things on purpose: removing the ownership check
+fails exactly 5 tests; removing single-use link enforcement fails exactly 1.
 
 ---
 
-## What is and is not server-backed yet
+## Still to do, in order
+
+**1. Set five secrets** in Manus -> Settings -> Secrets
+
+| Variable | Where it comes from |
+|---|---|
+| `DATABASE_URL` | Manus database panel |
+| `JWT_SECRET` | any long random string |
+| `ADMIN_EMAILS` | the owner's email — see note below |
+| `RESEND_API_KEY` | resend.com -> API Keys -> Create (sending access only) |
+| `EMAIL_FROM` | `MediCareer Agent <no-reply@hcqsai.uk>` |
+
+`ADMIN_EMAILS` is load-bearing: roles default to `user` and only an admin can grant
+admin, so **without it nobody can reach `/admin`, including the owner**. Any listed email
+is promoted on register or sign-in. It never demotes.
+
+**2. Merge `apply-fixes` into `main`**
+
+**3. Run the migrations** — `pnpm db:push`, or apply `0001` then `0002`.
+
+Caveat: `0001` adds a unique index on `users.email`. If two rows already share an email
+that statement fails and the duplicate must be cleared first.
+
+**4. Publish from Manus**
+
+**5. Register with the `ADMIN_EMAILS` address** — that becomes the admin login.
+
+Without step 1 the public pages work, but sign-in reports "Database is not configured".
+
+---
+
+## Domain
+
+`agent.hcqsai.uk` -> CNAME -> `cname.manus.space`, registered as a custom domain in
+Manus. Live and serving over HTTPS. It replaces `agent.tmla.com.sa`; keep the old one
+redirecting rather than deleting it, in case the link was shared anywhere.
+
+Nothing in the application hardcodes a domain — sign-in links are built from whatever
+host the doctor actually visited, so both domains work without a code change.
+
+---
+
+## What is and is not server-backed
 
 | Area | State |
 |---|---|
-| Registration, login, sessions, roles | ✅ server |
-| Sign-in links by email | ✅ server, tested |
-| Applications / documents / messages **API** | ✅ server, tested |
-| Apply form and Dashboard **UI** | ⚠️ still localStorage |
-| Admin tools (jobs, queue, follow-up) | ⚠️ still localStorage |
+| Registration, login, sessions, roles | server |
+| Email sign-in links | server, tested |
+| Applications / documents / messages **API** | server, tested |
+| Apply form and Dashboard **UI** | still browser localStorage |
+| Admin tools (jobs, queue, follow-up) | still browser localStorage |
 
-I stopped the frontend migration at auth deliberately. Moving the Apply form and
-Dashboard across also means building file upload to object storage, and I cannot verify
-any of it without a database or storage credentials — writing a large untested migration
-of your main conversion funnel seemed worse than stopping at a coherent point.
-
-The three places that still feed a user id into the old browser store are converted at
-the boundary and commented, so the app is consistent today rather than half-migrated.
-
-**Next step, when you have a database:** move the Apply form and Dashboard onto the
-applications API and add document upload. The API they need already exists and is tested.
+The frontend migration stopped at auth deliberately: moving the Apply form and Dashboard
+across also means building file upload to object storage, and none of it can be verified
+without a database or storage credentials. Writing a large untested migration of the main
+conversion funnel was the worse option. The API it needs already exists and is tested.
 
 ---
 
-## Still open — needs your decision
+## How tied is this to Manus?
 
-### 1. How do you publish?
+Less than it looks. `server/_core` holds 19 platform files, but only **one** is used by
+application code:
 
-Still unanswered, and it blocks everything above from reaching real users.
+| Module | Used? |
+|---|---|
+| `llm.ts` (AI job-screenshot extraction) | yes, by `routers.ts` |
+| `storageProxy`, `imageGeneration`, `voiceTranscription`, `map`, `notification`, `dataApi`, `heartbeat`, `sdk` | no — dead code from the template |
 
----
+Real lock-in is three things: hosting, the database, and the LLM proxy behind that one AI
+feature. All three have standard replacements — the app is plain Node + React + Vite +
+tRPC + Drizzle/MySQL. The auth added here talks only to your own database. Domain, email
+(Resend) and now the code (GitHub) are all owned directly.
 
-## Two things I corrected about my own earlier report
-
-1. I said the homepage counters (500+, 92%) were broken. **They are not.** They animate
-   correctly — my automated checks were reading a background browser tab, where Chrome
-   pauses that animation.
-2. I implied an open `/admin` exposed doctors' data. It did not — because all data lived
-   in each visitor's own browser, `/admin` only ever showed the seeded demo record. Worth
-   gating, which I did, but it was not a data breach.
-
-I also checked whether large uploads silently fail against the browser storage limit.
-**They do not** — 8 × 3 MB documents saved fine. Not a bug.
+Estimated cost of leaving: a day or two, not a rewrite. No need to decide now — keeping
+the code synced to GitHub is what preserves the option.
 
 ---
 
 ## Running it locally
 
-This machine has no system Node. Use the portable copy:
+This machine has no system Node; use the portable copy:
 
 ```powershell
 $n='C:\Users\cqips_cqi\Desktop\New folder\tools\node-v22.18.0-win-x64'
@@ -205,16 +151,12 @@ $env:Path="$n;$env:Path"; $env:COREPACK_ENABLE_DOWNLOAD_PROMPT='0'
 & "$n\node.exe" "$n\node_modules\corepack\dist\corepack.js" pnpm install
 ```
 
-Then, from Git Bash:
+Then from Git Bash:
 
 ```bash
 NODE_ENV=development JWT_SECRET=local-dev-secret \
   node node_modules/tsx/dist/cli.mjs server/_core/index.ts
 ```
 
-→ http://localhost:3000 (falls back to the next free port). Without `DATABASE_URL`,
-register and login correctly report "Database is not configured" instead of failing
-silently.
-
-I also ran `git init` and committed a baseline first — the project had no version control
-at all. `git log` shows each change separately, and `git diff 2d7e769` shows everything.
+Without `DATABASE_URL`, sign-in correctly reports "Database is not configured" rather
+than failing silently.
