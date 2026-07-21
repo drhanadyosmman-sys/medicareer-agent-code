@@ -2,7 +2,6 @@
 // Design: Navy/teal premium medical aesthetic. Staff workspace tools are internal only.
 
 import { useState, useEffect } from 'react';
-import { trpc } from '@/lib/trpc';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -127,8 +126,6 @@ export default function AdminApplications() {
     setShowProfile(true);
   };
 
-  const sendStatusUpdate = trpc.email.sendStatusUpdate.useMutation();
-  const sendMessageNotification = trpc.email.sendMessageNotification.useMutation();
 
   const changeStage = (appId: string, newStage: string) => {
     store.updateApplication(appId, { status: newStage as any });
@@ -137,9 +134,7 @@ export default function AdminApplications() {
     if (selectedApp?.id === appId) {
       setSelectedApp(prev => prev ? { ...prev, status: newStage as any } : null);
     }
-    // Send status update email to doctor
     if (app?.email) {
-      sendStatusUpdate.mutate({ to: app.email, name: app.fullName, newStatus: newStage });
     }
     toast.success(`Stage updated to: ${STAGE_LABELS[newStage]}`);
   };
@@ -500,14 +495,6 @@ export default function AdminApplications() {
                 refreshApplications();
                 setShowOutput(false);
                 setProfileTab('messages');
-                // Send email notification to doctor
-                if (selectedApp.email) {
-                  sendMessageNotification.mutate({
-                    to: selectedApp.email,
-                    name: selectedApp.fullName,
-                    messagePreview: generatedOutput.slice(0, 200) + (generatedOutput.length > 200 ? '...' : ''),
-                  });
-                }
                 toast.success('Sent to applicant');
               }}
               className="bg-teal hover:bg-teal/90 text-white btn-press"

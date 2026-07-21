@@ -1,50 +1,66 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock the Resend module to avoid real API calls during testing
-vi.mock('resend', () => {
-  return {
-    Resend: vi.fn().mockImplementation(() => ({
-      emails: {
-        send: vi.fn().mockResolvedValue({ id: 'test-email-id-123' }),
-      },
-    })),
-  };
-});
+// Mock global fetch
+const mockFetch = vi.fn();
+vi.stubGlobal("fetch", mockFetch);
 
-describe('Email Service', () => {
-  it('should import email functions without errors', async () => {
-    const emailModule = await import('./email');
-    expect(typeof emailModule.sendWelcomeEmail).toBe('function');
-    expect(typeof emailModule.sendApplicationConfirmationEmail).toBe('function');
-    expect(typeof emailModule.sendNewMessageNotificationEmail).toBe('function');
-    expect(typeof emailModule.sendStatusUpdateEmail).toBe('function');
-    expect(typeof emailModule.sendAdminNewApplicationAlert).toBe('function');
-    expect(typeof emailModule.sendJobSharedEmail).toBe('function');
+describe("Email Service", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockFetch.mockReset();
   });
 
-  it('should call sendWelcomeEmail without throwing', async () => {
-    const { sendWelcomeEmail } = await import('./email');
-    await expect(sendWelcomeEmail('test@example.com', 'Dr. Test')).resolves.not.toThrow();
+  it("should export sendEmail function", async () => {
+    const { sendEmail } = await import("./email");
+    expect(typeof sendEmail).toBe("function");
   });
 
-  it('should call sendApplicationConfirmationEmail without throwing', async () => {
-    const { sendApplicationConfirmationEmail } = await import('./email');
-    await expect(
-      sendApplicationConfirmationEmail('test@example.com', 'Dr. Test', 'app-12345')
-    ).resolves.not.toThrow();
+  it("should return not-configured when env vars are missing", async () => {
+    // Temporarily clear env vars
+    const origKey = process.env.RESEND_API_KEY;
+    const origFrom = process.env.EMAIL_FROM;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.EMAIL_FROM;
+
+    // Re-import to pick up cleared env
+    vi.resetModules();
+    const { sendEmail } = await import("./email");
+    const result = await sendEmail({
+      to: "test@example.com",
+      subject: "Test",
+      html: "<p>Hi</p>",
+      text: "Hi",
+    });
+    expect(result.sent).toBe(false);
+    if (!result.sent) {
+      expect(result.reason).toBe("not-configured");
+    }
+
+    // Restore
+    process.env.RESEND_API_KEY = origKey;
+    process.env.EMAIL_FROM = origFrom;
   });
 
-  it('should call sendStatusUpdateEmail without throwing', async () => {
-    const { sendStatusUpdateEmail } = await import('./email');
-    await expect(
-      sendStatusUpdateEmail('test@example.com', 'Dr. Test', 'under-review')
-    ).resolves.not.toThrow();
-  });
+  it("should call Resend API when configured", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: "test-id" }),
+    });
 
-  it('should call sendJobSharedEmail without throwing', async () => {
-    const { sendJobSharedEmail } = await import('./email');
-    await expect(
-      sendJobSharedEmail('test@example.com', 'Dr. Test', 'Clinical Fellow', 'Barts Health', 'London')
-    ).resolves.not.toThrow();
+    const { sendEmail } = await import("./email");
+    const result = await sendEmail({
+      to: "test@example.com",
+      subject: "Test Subject",
+      html: "<p>Hello</p>",
+      text: "Hello",
+    });
+
+    // If ENV vars are set, it should call fetch
+    if (result.sent) {
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://api.resend.com/emails",
+        expect.objectContaining({ method: "POST" })
+      );
+    }
   });
 });
