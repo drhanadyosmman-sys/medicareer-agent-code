@@ -4,9 +4,14 @@ import { Link } from 'wouter';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { FadeUp, SlideLeft, SlideRight, StaggerContainer, StaggerItem } from '@/components/ScrollAnimations';
 
+/**
+ * Places, not people. The portrait that used to sit here carried an
+ * "Application Ready / Profile Complete" badge across a real person's face,
+ * which reads as a satisfied client rather than decoration. See the note in
+ * Home.tsx.
+ */
 const IMAGES = {
   hero: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1400&q=80', // Hospital corridor
-  doctors: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&q=80', // Doctor portrait
   ward: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=1200&q=80', // Hospital ward
   london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1400&q=80', // London
 };
@@ -97,8 +102,8 @@ export default function UKDoctors() {
             <SlideLeft>
               <div className="relative">
                 <img
-                  src={IMAGES.doctors}
-                  alt="Doctor"
+                  src={IMAGES.ward}
+                  alt="NHS hospital ward"
                   className="rounded-2xl shadow-2xl w-full h-[450px] object-cover"
                 />
                 <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-5">

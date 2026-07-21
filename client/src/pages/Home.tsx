@@ -6,16 +6,18 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { FadeUp, SlideLeft, SlideRight, FloatingElement } from '@/components/ScrollAnimations';
 
-// Verified high-quality Unsplash images
+/**
+ * Unsplash images. The licence permits commercial use, but photographs of
+ * identifiable people carry no model release, and using a stranger's face beside
+ * claims about our team or our results implies something untrue. Everything kept
+ * here is a place, not a person. Portraits were removed along with the invented
+ * testimonials they illustrated; do not reintroduce one.
+ */
 const IMAGES = {
   hero: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80', // Modern glass building exterior
-  doctors: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80', // Doctor smiling
   london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1400&q=80', // London skyline
   hospital: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', // Hospital building
-  team: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&q=80', // Medical team
-  success: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80', // Doctor with stethoscope
   nhs: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=80', // Hospital interior
-  interview: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&q=80', // Professional meeting
 };
 
 export default function Home() {
@@ -261,47 +263,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== WHY CHOOSE US ===== */}
+      {/*
+        ===== WHO IS BEHIND THIS =====
+        Deliberately has no photograph. A stock image of strangers sitting beside
+        "doctors who have worked in the NHS" reads as a picture of the team, which
+        it would not be. Replace this with a real photograph of the actual team
+        when there is one - not with another stock shot.
+      */}
       <section className="py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
         <div className="container">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <SlideLeft>
-              <div className="relative">
-                <img
-                  src={IMAGES.team}
-                  alt="Medical team"
-                  className="rounded-2xl shadow-2xl w-full h-[500px] object-cover"
-                />
-              </div>
-            </SlideLeft>
+          <FadeUp className="max-w-3xl mx-auto text-center mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-6">
+              {t('home.whyChooseUs')}
+            </h2>
+            <p className="text-xl text-gray-600 leading-relaxed">
+              {t('home.whyChooseUsDesc')}
+            </p>
+          </FadeUp>
 
-            <SlideRight>
-              <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
-              <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-6">
-                {t('home.whyChooseUs')}
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                {t('home.whyChooseUsDesc')}
-              </p>
-              <div className="space-y-6">
-                {[
-                  { title: t('home.reason1Title'), desc: t('home.reason1Desc') },
-                  { title: t('home.reason2Title'), desc: t('home.reason2Desc') },
-                  { title: t('home.reason3Title'), desc: t('home.reason3Desc') },
-                  { title: t('home.reason4Title'), desc: t('home.reason4Desc') },
-                ].map((reason, i) => (
-                  <div key={i} className="flex gap-4 items-start group">
-                    <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-500 transition-colors duration-300">
-                      <CheckCircle className="w-5 h-5 text-teal-600 group-hover:text-white transition-colors duration-300" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-blue-900 mb-1">{reason.title}</h4>
-                      <p className="text-gray-600 text-sm leading-relaxed">{reason.desc}</p>
-                    </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {[
+              { title: t('home.reason1Title'), desc: t('home.reason1Desc') },
+              { title: t('home.reason2Title'), desc: t('home.reason2Desc') },
+              { title: t('home.reason3Title'), desc: t('home.reason3Desc') },
+              { title: t('home.reason4Title'), desc: t('home.reason4Desc') },
+            ].map((reason, i) => (
+              <FadeUp key={i} delay={i * 0.08}>
+                <div className="flex gap-4 items-start h-full p-7 rounded-2xl bg-white border border-gray-100 shadow-sm group">
+                  <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-500 transition-colors duration-300">
+                    <CheckCircle className="w-5 h-5 text-teal-600 group-hover:text-white transition-colors duration-300" />
                   </div>
-                ))}
-              </div>
-            </SlideRight>
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-1.5">{reason.title}</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">{reason.desc}</p>
+                  </div>
+                </div>
+              </FadeUp>
+            ))}
           </div>
         </div>
       </section>
