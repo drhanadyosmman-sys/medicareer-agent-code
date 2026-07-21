@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'wouter';
-import { ArrowRight, CheckCircle, Users, FileText, Target, Headphones } from 'lucide-react';
+import { ArrowRight, CheckCircle, Users, FileText, Target, Headphones, Globe, Building2 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { FadeUp, SlideLeft, SlideRight, FloatingElement } from '@/components/ScrollAnimations';
@@ -92,7 +92,14 @@ export default function Home() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-
+              <Link href="/pricing">
+                <Button
+                  variant="outline"
+                  className="px-8 py-6 text-lg rounded-xl border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-all duration-300"
+                >
+                  {t('home.seePricing')}
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Trust indicators */}
@@ -129,6 +136,60 @@ export default function Home() {
             <div className="w-1.5 h-3 bg-white/60 rounded-full" />
           </motion.div>
         </motion.div>
+      </section>
+
+      {/* ===== PAIN POINTS - name the problem before offering the fix ===== */}
+      <section className="py-24 lg:py-32 bg-gray-50">
+        <div className="container">
+          <FadeUp className="max-w-3xl mx-auto text-center mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
+              {t('home.painTitle')}
+            </h2>
+            <p className="text-xl text-gray-600">{t('home.painDesc')}</p>
+          </FadeUp>
+
+          <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto">
+            {['pain1', 'pain2', 'pain3', 'pain4', 'pain5', 'pain6'].map((key, i) => (
+              <FadeUp key={key} delay={i * 0.06}>
+                <div className="flex gap-4 items-start h-full p-6 rounded-2xl bg-white border border-gray-100 shadow-sm">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold mt-0.5">
+                    !
+                  </span>
+                  <p className="text-gray-700 leading-relaxed">{t(`home.${key}`)}</p>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== THE INSIGHT - explain the mechanism, this is what earns trust ===== */}
+      <section className="py-24 lg:py-32" style={{ backgroundColor: '#0a1628' }}>
+        <div className="container">
+          <div className="max-w-3xl mx-auto">
+            <FadeUp>
+              <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
+              <h2 className="font-serif text-4xl lg:text-5xl text-white mb-8">
+                {t('home.insightTitle')}
+              </h2>
+              <p className="text-xl text-white/75 leading-relaxed mb-10">
+                {t('home.insightBody')}
+              </p>
+            </FadeUp>
+
+            <div className="space-y-5">
+              {['insightPoint1', 'insightPoint2', 'insightPoint3'].map((key, i) => (
+                <FadeUp key={key} delay={0.1 + i * 0.08}>
+                  <div className="flex gap-4 items-start">
+                    <CheckCircle className="w-6 h-6 text-teal-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-lg text-white/85 leading-relaxed">{t(`home.${key}`)}</p>
+                  </div>
+                </FadeUp>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
@@ -249,6 +310,58 @@ export default function Home() {
           there are no real success stories to show. Re-add this section once
           there are genuine, attributable ones - fabricated reviews are unlawful
           under the UK's consumer protection rules, not merely inadvisable. */}
+
+      {/* ===== IS THIS FOR YOU - lets the wrong visitor leave early ===== */}
+      <section className="py-24 lg:py-32 bg-white">
+        <div className="container">
+          <FadeUp className="max-w-3xl mx-auto text-center mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
+              {t('home.forWhoTitle')}
+            </h2>
+            <p className="text-xl text-gray-600">{t('home.forWhoDesc')}</p>
+          </FadeUp>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {[
+              { title: 'forAbroadTitle', items: ['forAbroad1', 'forAbroad2', 'forAbroad3', 'forAbroad4'], icon: Globe },
+              { title: 'forUkTitle', items: ['forUk1', 'forUk2', 'forUk3', 'forUk4'], icon: Building2 },
+            ].map((col, i) => (
+              <FadeUp key={col.title} delay={i * 0.1}>
+                <div className="h-full p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-gray-100">
+                  <div className="w-12 h-12 rounded-xl bg-blue-900 flex items-center justify-center mb-5">
+                    <col.icon className="w-6 h-6 text-teal-400" />
+                  </div>
+                  <h3 className="font-serif text-2xl text-blue-900 mb-5">{t(`home.${col.title}`)}</h3>
+                  <ul className="space-y-3">
+                    {col.items.map(item => (
+                      <li key={item} className="flex gap-3 items-start">
+                        <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-700 leading-relaxed">{t(`home.${item}`)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+
+          {/* Saying plainly what the service will not do is what makes the rest credible. */}
+          <FadeUp delay={0.2} className="max-w-3xl mx-auto mt-16">
+            <div className="p-8 rounded-2xl border border-amber-200 bg-amber-50/60">
+              <h3 className="font-serif text-2xl text-blue-900 mb-5">{t('home.honestTitle')}</h3>
+              <ul className="space-y-3">
+                {['honest1', 'honest2', 'honest3'].map(k => (
+                  <li key={k} className="flex gap-3 items-start">
+                    <span className="text-amber-500 font-bold mt-0.5">—</span>
+                    <span className="text-gray-700 leading-relaxed">{t(`home.${k}`)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </FadeUp>
+        </div>
+      </section>
 
       {/* ===== HOSPITAL IMAGE BREAK ===== */}
       <section className="relative h-[350px] overflow-hidden">
