@@ -81,33 +81,52 @@ export default function Footer() {
               {lang === 'ar' ? 'تواصل معنا' : 'Contact'}
             </h4>
             <ul className="space-y-2.5">
-              <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>support@medicareeragent.com</li>
+              <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <a href="mailto:support@hcqsai.uk" style={{ color: 'inherit' }}>support@hcqsai.uk</a>
+              </li>
               <li className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>London, United Kingdom</li>
             </ul>
           </div>
         </div>
 
-        {/* TMLA Company Registration */}
+        {/*
+          Company registration. These are factual identifiers, deliberately worded as
+          what they are: an ICO entry means the company is on the data-protection
+          register, and a UKPRN identifies a provider on the UK Register of Learning
+          Providers. Neither is an endorsement of this service, so neither is
+          described as one.
+        */}
         <div className="mt-12 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div className="flex flex-col md:flex-row items-start gap-6 mb-6">
-            {/* TMLA Logo Text */}
+            {/* HCQS mark */}
             <div className="flex-shrink-0">
               <div className="px-3 py-1.5 rounded border" style={{ borderColor: 'rgba(251,191,36,0.3)', backgroundColor: 'rgba(251,191,36,0.05)' }}>
-                <span className="font-serif font-bold text-base" style={{ color: '#f59e0b' }}>TMLA</span>
+                <span className="font-serif font-bold text-base" style={{ color: '#f59e0b' }}>HCQS</span>
               </div>
             </div>
 
             {/* Registration Details */}
             <ul className="space-y-2">
               {[
-                lang === 'ar' ? 'مسجلة في المملكة العربية السعودية' : 'Registered in the Kingdom of Saudi Arabia',
-                lang === 'ar' ? 'السجل التجاري (CR): 7053685355' : 'Commercial Registration (CR): 7053685355',
-                lang === 'ar' ? 'مرخصة من وزارة الاستثمار في المملكة العربية السعودية (MISA)' : 'Licensed by the Ministry of Investment of Saudi Arabia (MISA)',
-                lang === 'ar' ? 'مملوكة بالكامل لـ TMLA Group Handelsbolag (السويد)' : 'Wholly Owned by TMLA Group Handelsbolag (Sweden)',
+                lang === 'ar'
+                  ? 'Healthcare Quality School (HCQS) — شركة أمريكية مسجلة في ولاية كولورادو، مدينة بولدر'
+                  : 'Healthcare Quality School (HCQS) — a US company registered in Boulder, Colorado',
+                lang === 'ar'
+                  ? 'ولها فرع في المملكة المتحدة'
+                  : 'with a branch in the United Kingdom',
+                lang === 'ar'
+                  ? 'مسجلة لدى مكتب مفوض المعلومات البريطاني (ICO)، رقم المرجع: ZC149125'
+                  : 'Registered with the UK Information Commissioner’s Office (ICO), reference ZC149125',
+                lang === 'ar'
+                  ? 'رقم المزوّد في السجل البريطاني لمقدمي التعليم (UKPRN): 10101333'
+                  : 'UK Register of Learning Providers reference (UKPRN): 10101333',
+                lang === 'ar'
+                  ? 'العنوان: 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom'
+                  : 'Address: 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom',
               ].map((item, i) => (
-                <li key={i} className="flex items-center gap-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#f59e0b', opacity: 0.7 }}></span>
-                  {item}
+                <li key={i} className="flex items-start gap-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: '#f59e0b', opacity: 0.7 }}></span>
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>

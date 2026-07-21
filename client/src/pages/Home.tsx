@@ -1,21 +1,23 @@
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'wouter';
-import { ArrowRight, CheckCircle, Users, FileText, Target, Headphones } from 'lucide-react';
+import { ArrowRight, CheckCircle, Users, FileText, Target, Headphones, Globe, Building2 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { FadeUp, SlideLeft, SlideRight, ScaleUp, AnimatedCounter, StaggerContainer, StaggerItem, FloatingElement } from '@/components/ScrollAnimations';
+import { FadeUp, SlideLeft, SlideRight, FloatingElement } from '@/components/ScrollAnimations';
 
-// Verified high-quality Unsplash images
+/**
+ * Unsplash images. The licence permits commercial use, but photographs of
+ * identifiable people carry no model release, and using a stranger's face beside
+ * claims about our team or our results implies something untrue. Everything kept
+ * here is a place, not a person. Portraits were removed along with the invented
+ * testimonials they illustrated; do not reintroduce one.
+ */
 const IMAGES = {
   hero: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80', // Modern glass building exterior
-  doctors: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&q=80', // Doctor smiling
   london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1400&q=80', // London skyline
   hospital: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80', // Hospital building
-  team: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&q=80', // Medical team
-  success: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80', // Doctor with stethoscope
   nhs: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&q=80', // Hospital interior
-  interview: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&q=80', // Professional meeting
 };
 
 export default function Home() {
@@ -92,7 +94,14 @@ export default function Home() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
-
+              <Link href="/pricing">
+                <Button
+                  variant="outline"
+                  className="px-8 py-6 text-lg rounded-xl border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-all duration-300"
+                >
+                  {t('home.seePricing')}
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Trust indicators */}
@@ -131,23 +140,54 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ===== STATS BAR ===== */}
-      <section className="relative -mt-16 z-20">
+      {/* ===== PAIN POINTS - name the problem before offering the fix ===== */}
+      <section className="py-24 lg:py-32 bg-gray-50">
         <div className="container">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 border border-gray-100">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {[
-                { value: 500, suffix: '+', label: lang === 'ar' ? 'طبيب ساعدناهم' : 'Doctors Helped' },
-                { value: 92, suffix: '%', label: lang === 'ar' ? 'نسبة القبول' : 'Success Rate' },
-                { value: 150, suffix: '+', label: lang === 'ar' ? 'مستشفى NHS' : 'NHS Trusts' },
-                { value: 48, suffix: 'h', label: lang === 'ar' ? 'وقت المراجعة' : 'Review Time' },
-              ].map((stat, i) => (
-                <div key={i}>
-                  <div className="font-serif text-4xl md:text-5xl font-bold text-blue-900">
-                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                  </div>
-                  <div className="text-gray-500 mt-2 text-sm font-medium">{stat.label}</div>
+          <FadeUp className="max-w-3xl mx-auto text-center mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
+              {t('home.painTitle')}
+            </h2>
+            <p className="text-xl text-gray-600">{t('home.painDesc')}</p>
+          </FadeUp>
+
+          <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto">
+            {['pain1', 'pain2', 'pain3', 'pain4', 'pain5', 'pain6'].map((key, i) => (
+              <FadeUp key={key} delay={i * 0.06}>
+                <div className="flex gap-4 items-start h-full p-6 rounded-2xl bg-white border border-gray-100 shadow-sm">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold mt-0.5">
+                    !
+                  </span>
+                  <p className="text-gray-700 leading-relaxed">{t(`home.${key}`)}</p>
                 </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== THE INSIGHT - explain the mechanism, this is what earns trust ===== */}
+      <section className="py-24 lg:py-32" style={{ backgroundColor: '#0a1628' }}>
+        <div className="container">
+          <div className="max-w-3xl mx-auto">
+            <FadeUp>
+              <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
+              <h2 className="font-serif text-4xl lg:text-5xl text-white mb-8">
+                {t('home.insightTitle')}
+              </h2>
+              <p className="text-xl text-white/75 leading-relaxed mb-10">
+                {t('home.insightBody')}
+              </p>
+            </FadeUp>
+
+            <div className="space-y-5">
+              {['insightPoint1', 'insightPoint2', 'insightPoint3'].map((key, i) => (
+                <FadeUp key={key} delay={0.1 + i * 0.08}>
+                  <div className="flex gap-4 items-start">
+                    <CheckCircle className="w-6 h-6 text-teal-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-lg text-white/85 leading-relaxed">{t(`home.${key}`)}</p>
+                  </div>
+                </FadeUp>
               ))}
             </div>
           </div>
@@ -214,110 +254,111 @@ export default function Home() {
                 {lang === 'ar' ? 'مستقبلك المهني يبدأ هنا' : 'Your Career Starts Here'}
               </h2>
               <p className="text-xl text-white/80 max-w-2xl">
-                {lang === 'ar' ? 'أكثر من ١٥٠ مستشفى NHS في جميع أنحاء المملكة المتحدة بانتظار طبيب مثلك' : 'Over 150 NHS Trusts across the United Kingdom are waiting for doctors like you'}
+                {lang === 'ar'
+                  ? 'نحن نبحث عن الوظائف المناسبة لك في الـ NHS، ونجهّز طلبك، ونتقدّم نيابةً عنك'
+                  : 'We find suitable NHS roles, prepare your application, and apply on your behalf'}
               </p>
             </FadeUp>
           </div>
         </div>
       </section>
 
-      {/* ===== WHY CHOOSE US ===== */}
+      {/*
+        ===== WHO IS BEHIND THIS =====
+        Deliberately has no photograph. A stock image of strangers sitting beside
+        "doctors who have worked in the NHS" reads as a picture of the team, which
+        it would not be. Replace this with a real photograph of the actual team
+        when there is one - not with another stock shot.
+      */}
       <section className="py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
         <div className="container">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <SlideLeft>
-              <div className="relative">
-                <img
-                  src={IMAGES.team}
-                  alt="Medical team"
-                  className="rounded-2xl shadow-2xl w-full h-[500px] object-cover"
-                />
-                <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-6 max-w-[200px]">
-                  <div className="font-serif text-3xl font-bold text-teal-600">
-                    <AnimatedCounter target={92} suffix="%" />
+          <FadeUp className="max-w-3xl mx-auto text-center mb-16">
+            <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
+            <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-6">
+              {t('home.whyChooseUs')}
+            </h2>
+            <p className="text-xl text-gray-600 leading-relaxed">
+              {t('home.whyChooseUsDesc')}
+            </p>
+          </FadeUp>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {[
+              { title: t('home.reason1Title'), desc: t('home.reason1Desc') },
+              { title: t('home.reason2Title'), desc: t('home.reason2Desc') },
+              { title: t('home.reason3Title'), desc: t('home.reason3Desc') },
+              { title: t('home.reason4Title'), desc: t('home.reason4Desc') },
+            ].map((reason, i) => (
+              <FadeUp key={i} delay={i * 0.08}>
+                <div className="flex gap-4 items-start h-full p-7 rounded-2xl bg-white border border-gray-100 shadow-sm group">
+                  <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-500 transition-colors duration-300">
+                    <CheckCircle className="w-5 h-5 text-teal-600 group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {lang === 'ar' ? 'نسبة النجاح' : 'Success Rate'}
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-1.5">{reason.title}</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">{reason.desc}</p>
                   </div>
                 </div>
-              </div>
-            </SlideLeft>
-
-            <SlideRight>
-              <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mb-6" />
-              <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-6">
-                {t('home.whyChooseUs')}
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                {t('home.whyChooseUsDesc')}
-              </p>
-              <div className="space-y-6">
-                {[
-                  { title: t('home.reason1Title'), desc: t('home.reason1Desc') },
-                  { title: t('home.reason2Title'), desc: t('home.reason2Desc') },
-                  { title: t('home.reason3Title'), desc: t('home.reason3Desc') },
-                  { title: t('home.reason4Title'), desc: t('home.reason4Desc') },
-                ].map((reason, i) => (
-                  <div key={i} className="flex gap-4 items-start group">
-                    <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-500 transition-colors duration-300">
-                      <CheckCircle className="w-5 h-5 text-teal-600 group-hover:text-white transition-colors duration-300" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-blue-900 mb-1">{reason.title}</h4>
-                      <p className="text-gray-600 text-sm leading-relaxed">{reason.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </SlideRight>
+              </FadeUp>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
+      {/* Testimonials removed: the service has not yet worked with any doctor, so
+          there are no real success stories to show. Re-add this section once
+          there are genuine, attributable ones - fabricated reviews are unlawful
+          under the UK's consumer protection rules, not merely inadvisable. */}
+
+      {/* ===== IS THIS FOR YOU - lets the wrong visitor leave early ===== */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="container">
           <FadeUp className="max-w-3xl mx-auto text-center mb-16">
             <div className="w-12 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full mx-auto mb-6" />
             <h2 className="font-serif text-4xl lg:text-5xl text-blue-900 mb-4">
-              {t('home.testimonialsTitle')}
+              {t('home.forWhoTitle')}
             </h2>
-            <p className="text-xl text-gray-600">
-              {t('home.testimonialsDesc')}
-            </p>
+            <p className="text-xl text-gray-600">{t('home.forWhoDesc')}</p>
           </FadeUp>
 
-          <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15}>
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {[
-              { text: t('home.testimonial1'), img: IMAGES.doctors },
-              { text: t('home.testimonial2'), img: IMAGES.success },
-              { text: t('home.testimonial3'), img: IMAGES.interview },
-            ].map((testimonial, i) => (
-              <StaggerItem key={i}>
-                <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, j) => (
-                      <span key={j} className="text-amber-400 text-lg">★</span>
+              { title: 'forAbroadTitle', items: ['forAbroad1', 'forAbroad2', 'forAbroad3', 'forAbroad4'], icon: Globe },
+              { title: 'forUkTitle', items: ['forUk1', 'forUk2', 'forUk3', 'forUk4'], icon: Building2 },
+            ].map((col, i) => (
+              <FadeUp key={col.title} delay={i * 0.1}>
+                <div className="h-full p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-gray-100">
+                  <div className="w-12 h-12 rounded-xl bg-blue-900 flex items-center justify-center mb-5">
+                    <col.icon className="w-6 h-6 text-teal-400" />
+                  </div>
+                  <h3 className="font-serif text-2xl text-blue-900 mb-5">{t(`home.${col.title}`)}</h3>
+                  <ul className="space-y-3">
+                    {col.items.map(item => (
+                      <li key={item} className="flex gap-3 items-start">
+                        <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-700 leading-relaxed">{t(`home.${item}`)}</span>
+                      </li>
                     ))}
-                  </div>
-                  <p className="text-gray-700 leading-relaxed mb-6 italic">
-                    "{testimonial.text}"
-                  </p>
-                  <div className="flex items-center gap-3 mt-auto">
-                    <img src={testimonial.img} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-teal-200" />
-                    <div>
-                      <div className="font-semibold text-blue-900 text-sm">
-                        {lang === 'ar' ? 'طبيب متخصص' : 'Medical Professional'}
-                      </div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
-                        🇬🇧 NHS Doctor
-                      </div>
-                    </div>
-                  </div>
+                  </ul>
                 </div>
-              </StaggerItem>
+              </FadeUp>
             ))}
-          </StaggerContainer>
+          </div>
+
+          {/* Saying plainly what the service will not do is what makes the rest credible. */}
+          <FadeUp delay={0.2} className="max-w-3xl mx-auto mt-16">
+            <div className="p-8 rounded-2xl border border-amber-200 bg-amber-50/60">
+              <h3 className="font-serif text-2xl text-blue-900 mb-5">{t('home.honestTitle')}</h3>
+              <ul className="space-y-3">
+                {['honest1', 'honest2', 'honest3'].map(k => (
+                  <li key={k} className="flex gap-3 items-start">
+                    <span className="text-amber-500 font-bold mt-0.5">—</span>
+                    <span className="text-gray-700 leading-relaxed">{t(`home.${k}`)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </FadeUp>
         </div>
       </section>
 

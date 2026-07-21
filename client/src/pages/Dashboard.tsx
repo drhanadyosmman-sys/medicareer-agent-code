@@ -15,6 +15,7 @@ import ChatPanel from '@/components/ChatPanel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { queueStore, JobSubmission } from '@/lib/appQueue';
 import { reviewStore, ResumeReviewRequest } from '@/lib/resumeReview';
+import { jobMgmt, NHSJob, SharedJob } from '@/lib/jobManagement';
 import {
   CheckCircle, AlertCircle, FileText, MessageSquare, Upload, Clock,
   ArrowRight, User, ChevronRight, Download, X, Loader2, Bell, CalendarCheck, Briefcase
@@ -70,7 +71,10 @@ export default function Dashboard() {
       return;
     }
     if (user) {
-      const app = store.getApplicationByUserId(user.id);
+      // Auth is server-backed now, but applications still live in this browser's
+      // localStorage, which is keyed by string. Until they move to the
+      // applications API the server's numeric id is used as that key.
+      const app = store.getApplicationByUserId(String(user.id));
       if (app) setApplication(app);
     }
   }, [isAuthenticated, user, navigate]);
@@ -527,8 +531,7 @@ export default function Dashboard() {
                 </h2>
               </div>
               {(() => {
-                const { jobMgmt } = require('@/lib/jobManagement');
-                const sharedJobs = jobMgmt.getSharedJobsForDoctor(user?.id || '');
+                const sharedJobs = jobMgmt.getSharedJobsForDoctor(user ? String(user.id) : '');
                 if (sharedJobs.length === 0) return (
                   <Card className="border-0 shadow-sm">
                     <CardContent className="p-8 text-center">
@@ -537,7 +540,7 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
                 );
-                return sharedJobs.map((sj: any) => (
+                return sharedJobs.map((sj: SharedJob & { job?: NHSJob }) => (
                   <Card key={sj.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between gap-4">

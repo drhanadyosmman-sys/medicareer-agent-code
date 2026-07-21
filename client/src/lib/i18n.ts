@@ -54,14 +54,52 @@ export const translations: Record<string, Record<string, Record<Language, string
 
   // ===== HOMEPAGE =====
   home: {
-    badge: { en: '🇬🇧 Building UK Medical Careers', ar: '🇬🇧 نبني مسارك المهني في بريطانيا' },
-    heroTitle: { en: 'We Apply to Jobs For You', ar: 'نتولى التقديم على الوظائف بدلاً منك' },
-    heroSubtitle: { en: 'Focus on your medicine. We handle your UK job applications.', ar: 'ركّز على تخصصك الطبي. نحن نتولى طلبات التقديم على وظائفك في بريطانيا.' },
-    heroDesc: { en: 'Upload your CV. Our team assesses your profile, identifies suitable NHS roles, tailors your applications, and guides you through interviews. You focus on medicine—we handle the rest.', ar: 'ارفع سيرتك الذاتية. فريقنا يقيّم ملفك، يحدد الوظائف المناسبة في الـ NHS، يعدّ طلبات التقديم المتخصصة، ويرشدك عبر مراحل المقابلات. أنت تركّز على الطب، ونحن نتولى الباقي.' },
+    badge: { en: '🇬🇧 For international doctors applying to the NHS', ar: '🇬🇧 للأطباء الدوليين المتقدمين للـ NHS' },
+    heroTitle: { en: 'Your experience is not the problem. Your application is.', ar: 'مشكلتك ليست في خبرتك، بل في طريقة عرضها.' },
+    heroSubtitle: { en: 'We write and submit your NHS applications — matched to what the panel actually scores.', ar: 'نكتب طلباتك للـ NHS ونقدّمها نيابةً عنك — مصاغة وفق ما تقيّمه لجنة الاختيار فعليًا.' },
+    heroDesc: { en: 'Most international doctors are filtered out before a human reads about their clinical skill. Not because they are not good enough, but because NHS shortlisting scores a written application against a written specification. We make sure yours answers it, line by line.', ar: 'أغلب الأطباء الدوليين يُستبعدون قبل أن يقرأ أحد عن مهاراتهم السريرية. ليس لأنهم غير أكفاء، بل لأن الترشيح في الـ NHS يقوم على تقييم طلب مكتوب مقابل مواصفات مكتوبة. نحن نضمن أن طلبك يجيب عليها، بندًا ببند.' },
     ctaButton: { en: 'Start Your Assessment', ar: 'ابدأ تقييم ملفك الآن' },
+    seePricing: { en: 'See what it costs', ar: 'شوف التكلفة' },
     uploadCv: { en: 'Upload Your CV', ar: 'ارفع سيرتك الذاتية' },
     noCommitment: { en: 'No upfront commitment', ar: 'بدون التزام مسبق' },
     personalConsultant: { en: 'Personal consultant', ar: 'مستشار مخصص لك' },
+
+    // Pain points
+    painTitle: { en: 'Does any of this sound familiar?', ar: 'هل يبدو أيٌّ من هذا مألوفًا؟' },
+    painDesc: { en: 'These are the things doctors tell us before they come to us.', ar: 'هذه هي الأمور التي يذكرها الأطباء لنا قبل أن يبدأوا معنا.' },
+    pain1: { en: 'You have applied to dozens of posts and heard almost nothing back — with no feedback explaining why.', ar: 'قدّمت على عشرات الوظائف ولم يصلك رد تقريبًا — ودون أي تفسير للسبب.' },
+    pain2: { en: 'You are not sure which grade you should even be applying for: Trust Grade, Clinical Fellow, SAS, or a training post.', ar: 'لست متأكدًا من الدرجة التي يجب أن تتقدم لها أصلًا: Trust Grade أم Clinical Fellow أم SAS أم وظيفة تدريبية.' },
+    pain3: { en: 'The "supporting information" box is sitting empty and you do not know what they expect you to put in it.', ar: 'خانة "المعلومات الداعمة" أمامك فارغة، ولا تعرف ما الذي يُنتظر منك كتابته فيها.' },
+    pain4: { en: 'You do not have a clear picture of what is still missing from your file — GMC, PLAB, English test, ALS, portfolio evidence.', ar: 'ليست لديك صورة واضحة عمّا ينقص ملفك — GMC، PLAB، اختبار اللغة، ALS، أدلة الملف المهني.' },
+    pain5: { en: 'You are working full clinical shifts. There is no time left to write a tailored application for every post.', ar: 'أنت تعمل مناوبات سريرية كاملة. لا يتبقى وقت لكتابة طلب مخصص لكل وظيفة.' },
+    pain6: { en: 'You do not know a single person inside the NHS you can ask.', ar: 'لا تعرف شخصًا واحدًا داخل الـ NHS يمكنك سؤاله.' },
+
+    // The insight
+    insightTitle: { en: 'Why strong doctors get filtered out', ar: 'لماذا يُستبعد أطباء أكفاء؟' },
+    insightBody: { en: 'NHS shortlisting is not a conversation. For most posts a panel scores your written application against a written person specification — essential criteria first, then desirable. If a criterion is not clearly evidenced in your own words, it scores nothing. However well you can actually do it on the ward.', ar: 'الترشيح في الـ NHS ليس محادثة. في أغلب الوظائف، تقوم لجنة بتقييم طلبك المكتوب مقابل "مواصفات الشخص" المكتوبة — المعايير الأساسية أولًا، ثم المفضّلة. وأي معيار لا يظهر عليه دليل واضح بكلماتك أنت، لا يحصل على أي درجة. مهما كنت تجيده فعليًا في القسم.' },
+    insightPoint1: { en: 'One CV sent to twenty posts cannot do this. Every post has its own specification.', ar: 'سيرة ذاتية واحدة تُرسل لعشرين وظيفة لا يمكنها فعل ذلك. لكل وظيفة مواصفاتها الخاصة.' },
+    insightPoint2: { en: 'Clinical excellence that is not written down is invisible to the scoring sheet.', ar: 'التميّز السريري الذي لا يُكتب لا وجود له في ورقة التقييم.' },
+    insightPoint3: { en: 'This is a writing and evidence problem. It is fixable — and it is what we do.', ar: 'هذه مشكلة صياغة وأدلة، وهي قابلة للحل — وهذا تحديدًا ما نقوم به.' },
+
+    // Who it is for
+    forWhoTitle: { en: 'Is this for you?', ar: 'هل هذه الخدمة تناسبك؟' },
+    forWhoDesc: { en: 'We work with doctors at two very different stages.', ar: 'نعمل مع الأطباء في مرحلتين مختلفتين تمامًا.' },
+    forAbroadTitle: { en: 'You are outside the UK', ar: 'أنت خارج بريطانيا' },
+    forAbroad1: { en: 'You hold a medical degree and have clinical experience', ar: 'لديك شهادة طب وخبرة سريرية' },
+    forAbroad2: { en: 'You have GMC registration, or you are working towards it', ar: 'لديك تسجيل GMC أو تسعى للحصول عليه' },
+    forAbroad3: { en: 'You need to know realistically where you stand, and what to fix first', ar: 'تحتاج معرفة موقعك الحقيقي، وما الذي يجب إصلاحه أولًا' },
+    forAbroad4: { en: 'You want roles that will actually consider visa sponsorship', ar: 'تريد وظائف تنظر فعليًا في رعاية التأشيرة' },
+    forUkTitle: { en: 'You are already in the UK', ar: 'أنت بالفعل في بريطانيا' },
+    forUk1: { en: 'You have GMC registration and UK clinical exposure', ar: 'لديك تسجيل GMC وخبرة سريرية في بريطانيا' },
+    forUk2: { en: 'You are applying regularly but not being shortlisted', ar: 'تقدّم بانتظام لكن لا يتم ترشيحك' },
+    forUk3: { en: 'You want to move from a service post into training', ar: 'تريد الانتقال من وظيفة خدمية إلى مسار تدريبي' },
+    forUk4: { en: 'You need your portfolio evidence presented properly', ar: 'تحتاج عرض أدلة ملفك المهني بالشكل الصحيح' },
+
+    // Honesty
+    honestTitle: { en: 'What we do not do', ar: 'ما الذي لا نقوم به' },
+    honest1: { en: 'We do not guarantee you a job. Nobody honestly can.', ar: 'لا نضمن لك وظيفة. لا أحد يستطيع ذلك بصدق.' },
+    honest2: { en: 'We do not invent experience you do not have. We present what is genuinely yours, properly.', ar: 'لا نختلق خبرة ليست لديك. نعرض ما هو لك فعلًا، بالشكل الصحيح.' },
+    honest3: { en: 'If your profile is not ready yet, we will tell you that plainly — and tell you what to fix first.', ar: 'إذا كان ملفك غير جاهز بعد، سنخبرك بذلك بوضوح — ونوضح لك ما يجب إصلاحه أولًا.' },
 
     // How It Works
     howItWorks: { en: 'How We Help You', ar: 'كيف نساعدك' },
@@ -76,23 +114,20 @@ export const translations: Record<string, Record<string, Record<Language, string
     step4Desc: { en: 'We provide interview guidance, anticipated questions, and confidence-building strategies specific to NHS roles.', ar: 'نوفر لك إرشادات عملية، أسئلة متوقعة، ونصائح تساعدك على اجتياز المقابلة بثقة واحترافية.' },
 
     // Why Choose Us
-    whyChooseUs: { en: 'Why Choose Us', ar: 'لماذا تختارنا' },
-    whyChooseUsDesc: { en: 'We are a team of medical professionals who understand the UK system inside and out.', ar: 'فريقنا يتكون من متخصصين في المجال الطبي يفهمون النظام البريطاني بعمق.' },
-    reason1Title: { en: 'Expert Knowledge', ar: 'خبرة عميقة' },
-    reason1Desc: { en: 'We know exactly what NHS trusts are looking for and how to position your profile.', ar: 'نعرف بالضبط ما يبحث عنه الـ NHS، وكيف نعرض ملفك بأفضل صورة.' },
-    reason2Title: { en: 'Time Saved', ar: 'توفير وقتك' },
-    reason2Desc: { en: 'No more endless job searches and application forms. We find and apply to suitable roles for you.', ar: 'لا مزيد من البحث المرهق عن الوظائف. نحن نجد الفرص المناسبة ونقدم لك عليها.' },
-    reason3Title: { en: 'Higher Success Rate', ar: 'نسبة نجاح أعلى' },
-    reason3Desc: { en: 'Our tailored approach significantly increases your chances of being shortlisted for interviews.', ar: 'نهجنا المتخصص يزيد بشكل ملحوظ من فرصك في الترشيح للمقابلات.' },
+    whyChooseUs: { en: 'Who is behind this', ar: 'من نحن' },
+    whyChooseUsDesc: { en: 'Doctors who have worked in the NHS, alongside specialists in medical education and healthcare quality. We know this route because we have taken it ourselves.', ar: 'أطباء عملوا داخل الـ NHS، ومعهم متخصصون في التعليم الطبي وجودة الرعاية الصحية. نعرف هذا الطريق لأننا سلكناه بأنفسنا.' },
+    reason1Title: { en: 'We have been where you are', ar: 'مررنا بما تمر به' },
+    reason1Desc: { en: 'The confusion about grades, the silent rejections, the blank supporting information box. We have sat with all of it.', ar: 'الحيرة في الدرجات، والرفض الصامت، وخانة المعلومات الداعمة الفارغة. مررنا بكل ذلك.' },
+    reason2Title: { en: 'Your time goes back to medicine', ar: 'وقتك يعود للطب' },
+    reason2Desc: { en: 'We do the searching, the writing and the submitting. You review and approve — nothing is sent without you seeing it.', ar: 'نحن نتولى البحث والكتابة والتقديم. أنت تراجع وتوافق — ولا يُرسل شيء دون أن تراه.' },
+    reason3Title: { en: 'Matched to the Person Specification', ar: 'مطابقة لمواصفات الوظيفة' },
+    reason3Desc: { en: 'Every application is written against the specific person specification for that role, not sent as a generic CV.', ar: 'كل طلب يُكتب وفقاً لمواصفات الوظيفة المحددة، وليس سيرة ذاتية عامة تُرسل للجميع.' },
     reason4Title: { en: 'Full Support', ar: 'دعم شامل' },
     reason4Desc: { en: 'From CV to interview, we are with you every step of the way until you secure a position.', ar: 'من السيرة الذاتية إلى المقابلة، نرافقك في كل خطوة حتى تحصل على الوظيفة.' },
 
-    // Testimonials
-    testimonialsTitle: { en: 'Success Stories', ar: 'قصص النجاح' },
-    testimonialsDesc: { en: 'Hear from doctors who have secured positions through our service.', ar: 'اسمع من الأطباء الذين حصلوا على وظائفهم من خلالنا.' },
-    testimonial1: { en: 'I was applying for months with no success. MediCareer Agent completely transformed my CV and within 6 weeks, I had 3 interview offers. Highly recommended.', ar: 'كنت أتقدم على الوظائف لأشهر بدون نتيجة. فريق MediCareer غيّر سيرتي الذاتية بالكامل، وفي غضون ستة أسابيع، حصلت على 3 عروض مقابلات. أنصح به بشدة.' },
-    testimonial2: { en: 'The team understood exactly what I needed. They not only improved my application but also prepared me thoroughly for the interview. I got the job!', ar: 'الفريق فهم احتياجاتي بدقة. لم يحسّنوا طلبي فقط، بل جهّزوني بشكل شامل للمقابلة. حصلت على الوظيفة!' },
-    testimonial3: { en: 'As an IMG, I was worried about competing with UK graduates. MediCareer Agent showed me how to highlight my unique strengths. Now I work at a leading NHS trust.', ar: 'كطبيب متخرج من الخارج، كنت قلقاً من المنافسة. فريق MediCareer علّمني كيف أبرز نقاط قوتي الفريدة. الآن أعمل في أحد أكبر مستشفيات الـ NHS.' },
+    // Testimonials: intentionally removed. The three that were here were written
+    // for a service that has not yet worked with any doctor. Add real, attributable
+    // ones when they exist - and keep the doctor's own wording and consent.
 
     // FAQ
     faqTitle: { en: 'Frequently Asked Questions', ar: 'الأسئلة الشائعة' },
@@ -111,7 +146,7 @@ export const translations: Record<string, Record<string, Record<Language, string
 
     // CTA Final
     ctaFinalTitle: { en: 'Ready to Launch Your UK Medical Career?', ar: 'هل أنت مستعد لبدء مسيرتك الطبية في بريطانيا؟' },
-    ctaFinalDesc: { en: 'Join hundreds of doctors who have successfully secured NHS positions. Start your assessment today.', ar: 'انضم إلى مئات الأطباء الذين حصلوا على وظائفهم في الـ NHS. ابدأ تقييمك اليوم.' },
+    ctaFinalDesc: { en: 'Send us your CV and we will tell you honestly where you stand and what to do next. Start your assessment today.', ar: 'أرسل لنا سيرتك الذاتية وسنخبرك بصراحة أين أنت وما الخطوة التالية. ابدأ تقييمك اليوم.' },
     beginAssessment: { en: 'Begin Your Assessment', ar: 'ابدأ التقييم الآن' },
     learnMore: { en: 'Learn More', ar: 'تعرف على المزيد' },
   },

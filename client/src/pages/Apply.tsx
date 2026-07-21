@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,8 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { store, DocumentFile } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
+import { trpc } from '@/lib/trpc';
+import { readableError } from '@/lib/errorMessage';
 import { ArrowRight, ArrowLeft, Upload, CheckCircle, FileText, Mic, X, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -47,6 +48,19 @@ function formatFileSize(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
+/**
+ * A password for an account created during application submission. The applicant
+ * never sees it and never needs it - they sign in through the emailed link. It
+ * exists only because an account must have some credential.
+ */
+function randomPassword(): string {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  let binary = '';
+  bytes.forEach(b => { binary += String.fromCharCode(b); });
+  return btoa(binary);
+}
+
 export default function Apply() {
   const [step, setStep] = useState(1);
   const [, navigate] = useLocation();
@@ -63,6 +77,8 @@ export default function Apply() {
 
   const [uploadedFiles, setUploadedFiles] = useState<DocumentFile[]>([]);
   const [uploadingCategory, setUploadingCategory] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const requestLoginLink = trpc.auth.requestLoginLink.useMutation();
 
   const updateForm = (field: string, value: string | boolean) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -126,26 +142,50 @@ export default function Apply() {
     }
   };
 
-  const sendWelcome = trpc.email.sendWelcome.useMutation();
-  const sendAppConfirmation = trpc.email.sendApplicationConfirmation.useMutation();
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.consent1 || !form.consent2 || !form.consent3) {
       toast.error('Please accept all consent checkboxes');
       return;
     }
 
-    if (!user) {
-      const pwd = 'temp' + Date.now();
-      register(form.fullName, form.email, pwd);
+    setSubmitting(true);
+
+    // Resolve the account this application belongs to before writing anything.
+    let accountId = user?.id ?? null;
+
+    if (!accountId) {
+      try {
+        // A random password the applicant never needs: they get back in through
+        // the emailed sign-in link, not by remembering this.
+        const created = await register(form.fullName, form.email, randomPassword());
+        accountId = created.id;
+        // Give them a way back in later, not just for this session.
+        requestLoginLink.mutate({ email: form.email, lang: lang === 'ar' ? 'ar' : 'en' });
+      } catch (error) {
+        const message = readableError(error);
+        if (/already exists/i.test(message)) {
+          // Returning applicant who is signed out. Do not silently attach the
+          // application to an account they have not proved they own - email them
+          // a link and let them sign in first.
+          requestLoginLink.mutate({ email: form.email, lang: lang === 'ar' ? 'ar' : 'en' });
+          toast.info(
+            lang === 'ar'
+              ? 'لديك حساب بالفعل بهذا البريد. أرسلنا لك رابط دخول — سجّل الدخول ثم أكمل التقديم.'
+              : 'You already have an account with this email. We have sent you a sign-in link — please sign in, then submit.'
+          );
+        } else {
+          toast.error(message);
+        }
+        setSubmitting(false);
+        return;
+      }
     }
 
-    const currentUser = store.getCurrentUser();
     const appId = `app-${Date.now()}`;
 
     const application = {
       id: appId,
-      userId: currentUser?.id || `user-${Date.now()}`,
+      userId: String(accountId),
       status: 'submitted' as const,
       readinessScore: calculateReadiness(),
       createdAt: new Date().toISOString(),
@@ -187,16 +227,13 @@ export default function Apply() {
     };
 
     store.addApplication(application);
+    setSubmitting(false);
+
     // Redirect to checkout with plan details from URL params
     const urlParams = new URLSearchParams(window.location.search);
     const planId = urlParams.get('plan') || 'standard';
     const planName = urlParams.get('planName') || 'Standard Package';
     const price = urlParams.get('price') || '299';
-    // Send emails (fire-and-forget, don't block UI)
-    if (form.email) {
-      sendWelcome.mutate({ to: form.email, name: form.fullName });
-      sendAppConfirmation.mutate({ to: form.email, name: form.fullName, applicationId: appId });
-    }
     toast.success(lang === 'ar' ? 'تم إرسال الطلب! جاري التحويل للدفع...' : 'Application submitted! Redirecting to payment...');
     setTimeout(() => navigate(`/checkout?plan=${planId}&planName=${encodeURIComponent(planName)}&price=${price}`), 1000);
   };

@@ -30,7 +30,7 @@ export default function Navbar() {
       if (isAdmin) {
         setUnreadCount(store.getAdminUnreadCount());
       } else {
-        setUnreadCount(store.getUnreadCount(user.id));
+        setUnreadCount(store.getUnreadCount(String(user.id)));
       }
     };
     updateUnread();

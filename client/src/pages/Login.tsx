@@ -1,14 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { store } from '@/lib/store';
+import { readableError } from '@/lib/errorMessage';
 import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+/** Messages for the ?error= values the login-link route redirects back with. */
+const LINK_ERRORS: Record<string, { en: string; ar: string }> = {
+  'invalid-link': {
+    en: 'That sign-in link is not valid. It may already have been used — request a new one below.',
+    ar: 'رابط الدخول غير صالح. ربما تم استخدامه من قبل — اطلب رابطاً جديداً بالأسفل.',
+  },
+  'expired-link': {
+    en: 'That sign-in link has expired. Request a new one below.',
+    ar: 'انتهت صلاحية رابط الدخول. اطلب رابطاً جديداً بالأسفل.',
+  },
+  'link-failed': {
+    en: 'Something went wrong signing you in. Please request a new link.',
+    ar: 'حدث خطأ أثناء تسجيل دخولك. من فضلك اطلب رابطاً جديداً.',
+  },
+};
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,49 +34,71 @@ export default function Login() {
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [linkSent, setLinkSent] = useState(false);
+  const [sendingLink, setSendingLink] = useState(false);
   const { login, register } = useAuth();
   const [, navigate] = useLocation();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const requestLoginLink = trpc.auth.requestLoginLink.useMutation();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // The login-link route redirects here with ?error=... when a link fails.
+  useEffect(() => {
+    const reason = new URLSearchParams(window.location.search).get('error');
+    if (!reason) return;
+    const message = LINK_ERRORS[reason];
+    if (message) toast.error(lang === 'ar' ? message.ar : message.en);
+    // Clear it so a refresh does not show the same error again.
+    window.history.replaceState({}, '', window.location.pathname);
+  }, [lang]);
 
-    if (isRegister) {
-      if (!name || !email || !password) {
-        toast.error('Please fill in all fields');
-        setLoading(false);
-        return;
-      }
-      const success = register(name, email, password);
-      if (success) {
-        toast.success('Account created successfully');
-        setTimeout(() => navigate('/dashboard'), 100);
-      } else {
-        toast.error('An account with this email already exists');
-      }
-    } else {
-      const success = login(email, password);
-      if (success) {
-        // Read role directly from store after login to ensure fresh data
-        const currentUser = store.getCurrentUser();
-        const destination = currentUser?.role === 'admin' ? '/admin' : '/dashboard';
-        toast.success(`Welcome back, ${currentUser?.name}`);
-        setTimeout(() => navigate(destination), 100);
-      } else {
-        toast.error('Invalid email or password. Please check your credentials.');
-      }
+  const handleSendLink = async () => {
+    if (!email) {
+      toast.error(lang === 'ar' ? 'أدخل بريدك الإلكتروني أولاً' : 'Enter your email address first');
+      return;
     }
-    setLoading(false);
+    setSendingLink(true);
+    try {
+      await requestLoginLink.mutateAsync({ email, lang: lang === 'ar' ? 'ar' : 'en' });
+      // Shown regardless of whether the address has an account, matching what the
+      // server reports - the page must not reveal who is registered either.
+      setLinkSent(true);
+    } catch (error) {
+      toast.error(readableError(error));
+    } finally {
+      setSendingLink(false);
+    }
   };
 
-  const fillDemo = (type: 'admin' | 'doctor') => {
-    if (type === 'admin') {
-      setEmail('admin@medicareer.com');
-      setPassword('admin123');
-    } else {
-      setEmail('doctor@example.com');
-      setPassword('doctor123');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password || (isRegister && !name)) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    if (isRegister && password.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isRegister) {
+        await register(name, email, password);
+        toast.success('Account created successfully');
+        navigate('/dashboard');
+      } else {
+        await login(email, password);
+        toast.success('Welcome back');
+        // The redirect target depends on the role the *server* reports.
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      // The server deliberately returns the same message for an unknown email as
+      // for a wrong password; surface it as-is rather than guessing which it was.
+      toast.error(readableError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -119,36 +158,53 @@ export default function Login() {
             </Button>
           </form>
 
+          {!isRegister && (
+            <div className="mt-6 pt-6 border-t border-border">
+              {linkSent ? (
+                <div className="text-center">
+                  <p className="text-sm font-medium text-navy mb-1">
+                    {lang === 'ar' ? 'تحقّق من بريدك الإلكتروني' : 'Check your email'}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {lang === 'ar'
+                      ? `إذا كان لديك حساب بهذا البريد، فقد أرسلنا إليه رابط دخول. الرابط يعمل مرة واحدة وينتهي خلال ١٥ دقيقة.`
+                      : `If an account exists for that address, we have sent it a sign-in link. It works once and expires in 15 minutes.`}
+                  </p>
+                  <button
+                    onClick={() => setLinkSent(false)}
+                    className="text-xs text-teal hover:underline mt-3"
+                  >
+                    {lang === 'ar' ? 'استخدام بريد آخر' : 'Use a different address'}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-muted-foreground text-center mb-3">
+                    {lang === 'ar' ? 'نسيت كلمة السر؟' : 'Forgotten your password?'}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={sendingLink}
+                    onClick={handleSendLink}
+                    className="w-full"
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    {sendingLink
+                      ? lang === 'ar' ? 'جارٍ الإرسال...' : 'Sending...'
+                      : lang === 'ar' ? 'أرسل لي رابط دخول' : 'Email me a sign-in link'}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+
           <div className="mt-6 text-center">
             <button onClick={() => setIsRegister(!isRegister)} className="text-sm text-teal hover:underline">
               {isRegister ? t('login.hasAccount') : t('login.noAccount')}
             </button>
           </div>
 
-          {/* Demo credentials with quick-fill buttons */}
-          <div className="mt-6 p-4 bg-muted/50 rounded-xl border border-border">
-            <p className="text-xs font-medium text-navy text-center mb-3">{t('login.demoTitle')}</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => fillDemo('admin')}
-                className="p-2.5 rounded-lg bg-navy/5 hover:bg-navy/10 border border-navy/10 text-left transition-colors"
-              >
-                <p className="text-xs font-semibold text-navy">Admin</p>
-                <p className="text-xs text-muted-foreground">admin@medicareer.com</p>
-                <p className="text-xs text-muted-foreground">admin123</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('doctor')}
-                className="p-2.5 rounded-lg bg-teal/5 hover:bg-teal/10 border border-teal/10 text-left transition-colors"
-              >
-                <p className="text-xs font-semibold text-teal">Doctor</p>
-                <p className="text-xs text-muted-foreground">doctor@example.com</p>
-                <p className="text-xs text-muted-foreground">doctor123</p>
-              </button>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
