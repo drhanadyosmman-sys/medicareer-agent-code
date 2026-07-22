@@ -13,6 +13,7 @@ import {
   messagesRepo,
 } from "../repos";
 import { storagePut } from "../storage";
+import { evaluateEligibility } from "../eligibility";
 
 const applicationInput = z.object({
   fullName: z.string().trim().min(1).max(255),
@@ -157,6 +158,11 @@ export const applicationsRouter = router({
     .mutation(async ({ input, ctx }) => {
       await loadOwned(input.applicationId, ctx.user);
       const buffer = Buffer.from(input.base64, "base64");
+      // Server-side size validation: use actual buffer length, not client-reported size
+      const actualSize = buffer.length;
+      if (actualSize > 20 * 1024 * 1024) {
+        throw new TRPCError({ code: "PAYLOAD_TOO_LARGE", message: "File exceeds 20MB limit" });
+      }
       const key = `applications/${input.applicationId}/${input.category}/${input.name}`;
       const { key: storageKey, url } = await storagePut(
         key,
@@ -168,7 +174,7 @@ export const applicationsRouter = router({
         category: input.category,
         name: input.name,
         mimeType: input.mimeType,
-        sizeBytes: input.sizeBytes,
+        sizeBytes: actualSize, // Use server-computed size, never trust client
         storageKey,
       });
       return { success: true, storageKey, url } as const;
@@ -264,5 +270,31 @@ export const applicationsRouter = router({
       if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Application not found" });
       await adminNotesRepo.create({ ...input, authorUserId: ctx.user.id });
       return { success: true } as const;
+    }),
+
+  /* ─────────────────────────────────── Eligibility Engine ─────────────────── */
+
+  /**
+   * Evaluates a doctor's eligibility to work in the UK NHS based on real
+   * regulatory requirements (visa, degree recognition, GMC registration).
+   */
+  checkEligibility: protectedProcedure
+    .input(z.object({ applicationId: z.number().int().positive() }))
+    .query(async ({ input, ctx }) => {
+      const application = await loadOwned(input.applicationId, ctx.user);
+      return evaluateEligibility({
+        nationality: application.nationality ?? undefined,
+        countryOfResidence: application.countryOfResidence ?? undefined,
+        medicalSchool: application.medicalSchool ?? undefined,
+        graduationYear: application.graduationYear ?? undefined,
+        gmcStatus: application.gmcStatus ?? undefined,
+        plabStatus: application.plabStatus ?? undefined,
+        ieltsOetStatus: application.ieltsOetStatus ?? undefined,
+        yearsExperience: application.yearsExperience ?? undefined,
+        specialtyInterest: application.specialtyInterest ?? undefined,
+        internshipCompleted: application.internshipCompleted,
+        nhsExperience: application.nhsExperience,
+        previousUkApplications: application.previousUkApplications,
+      });
     }),
 });

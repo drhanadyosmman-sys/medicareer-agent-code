@@ -66,11 +66,23 @@ export default function Dashboard() {
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
-  // Fetch applications from the real backend
-  const { data: myApps, isLoading: appsLoading } = trpc.applications.mine.useQuery(
+  // Fetch the doctor's applications list from backend
+  const { data: myApps } = trpc.applications.mine.useQuery(
     undefined,
     { enabled: isAuthenticated }
   );
+  const appId = myApps?.[0]?.id;
+
+  // Fetch full application details (with documents + messages) from backend
+  const { data: fullApp, refetch: refetchApp } = trpc.applications.byId.useQuery(
+    { id: appId! },
+    { enabled: !!appId }
+  );
+
+  // Mutation for uploading documents to S3
+  const uploadDocument = trpc.applications.uploadDocument.useMutation({
+    onSuccess: () => { refetchApp(); },
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -80,9 +92,8 @@ export default function Dashboard() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (myApps && myApps.length > 0) {
-      const app = myApps[0];
-      // Map server data to the DoctorApplication shape the UI expects
+    if (fullApp) {
+      const app = fullApp;
       setApplication({
         id: String(app.id),
         userId: String(app.userId),
@@ -111,14 +122,27 @@ export default function Dashboard() {
         previousUkApplications: app.previousUkApplications,
         previousInterviews: app.previousInterviews,
         careerStory: app.careerStory || '',
-        documents: [],
-        messages: [],
+        documents: (app.documents || []).map((d: any) => ({
+          id: String(d.id),
+          name: d.name,
+          type: d.mimeType || '',
+          category: d.category,
+          uploadedAt: d.uploadedAt ? new Date(d.uploadedAt).toISOString() : '',
+          size: d.sizeBytes ? formatFileSize(d.sizeBytes) : '',
+        })),
+        messages: (app.messages || []).map((m: any) => ({
+          id: String(m.id),
+          from: m.sender as 'admin' | 'user',
+          content: m.content,
+          createdAt: m.createdAt ? new Date(m.createdAt).toISOString() : '',
+          read: !!m.readAt,
+        })),
         adminNotes: [],
         missingDocuments: (app.missingDocuments as string[]) || [],
         recommendedSteps: (app.recommendedSteps as string[]) || [],
       });
     }
-  }, [myApps]);
+  }, [fullApp]);
 
   // Unread message count
   const unreadCount = application?.messages.filter(m => m.from === 'admin' && !m.read).length ?? 0;
@@ -129,48 +153,37 @@ export default function Dashboard() {
     input.accept = accept;
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file || !application) return;
+      if (!file || !application || !appId) return;
       if (file.size > 10 * 1024 * 1024) {
         toast.error('File too large. Maximum size is 10MB.');
         return;
       }
       setUploadingCategory(category);
       const reader = new FileReader();
-      reader.onload = (readerEvent) => {
+      reader.onload = async (readerEvent) => {
         const dataUrl = readerEvent.target?.result as string;
-        const fileId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        store.saveFileData(fileId, dataUrl);
-
-        const docFile: DocumentFile = {
-          id: fileId,
-          name: file.name,
-          type: file.type,
-          category: category as any,
-          uploadedAt: new Date().toISOString(),
-          size: formatFileSize(file.size),
-        };
-
-        // Replace existing doc of same category or add new
-        const existingIdx = application.documents.findIndex(d => d.category === category);
-        let updatedDocs: DocumentFile[];
-        if (existingIdx >= 0) {
-          store.deleteFileData(application.documents[existingIdx].id);
-          updatedDocs = [...application.documents];
-          updatedDocs[existingIdx] = docFile;
-        } else {
-          updatedDocs = [...application.documents, docFile];
+        // Strip the data:...;base64, prefix
+        const base64 = dataUrl.split(',')[1];
+        if (!base64) {
+          setUploadingCategory(null);
+          toast.error('Failed to read file.');
+          return;
         }
-
-        // Update missing documents list
-        const updatedMissing = application.missingDocuments.filter(m => {
-          const catLabel = DOC_CATEGORIES.find(d => d.category === category)?.label || '';
-          return !m.toLowerCase().includes(catLabel.toLowerCase().split(' ')[0]);
-        });
-
-        store.updateApplication(application.id, { documents: updatedDocs, missingDocuments: updatedMissing });
-        setApplication(prev => prev ? { ...prev, documents: updatedDocs, missingDocuments: updatedMissing } : null);
-        setUploadingCategory(null);
-        toast.success(`${file.name} uploaded successfully`);
+        try {
+          await uploadDocument.mutateAsync({
+            applicationId: appId,
+            category: category as any,
+            name: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            sizeBytes: file.size,
+            base64,
+          });
+          setUploadingCategory(null);
+          toast.success(`${file.name} uploaded successfully`);
+        } catch (err) {
+          setUploadingCategory(null);
+          toast.error('Failed to upload file. Please try again.');
+        }
       };
       reader.onerror = () => {
         setUploadingCategory(null);
