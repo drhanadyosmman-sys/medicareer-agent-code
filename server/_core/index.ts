@@ -5,7 +5,9 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerLoginLinkRoute } from "../auth/loginLinkRoute";
-import { registerStorageProxy } from "./storageProxy";
+// NOTE: ./storageProxy is deliberately NOT used. It serves any stored file to
+// anyone who asks. registerSecureStorageRoute replaces it and checks ownership.
+import { registerSecureStorageRoute } from "../secureStorageRoute";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -35,7 +37,7 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  registerStorageProxy(app);
+  registerSecureStorageRoute(app);
   registerOAuthRoutes(app);
   registerLoginLinkRoute(app);
   // tRPC API

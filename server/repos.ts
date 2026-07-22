@@ -223,6 +223,20 @@ export const documentsRepo = {
     return rows[0];
   },
 
+  /**
+   * Resolves a stored file back to its document row, so a download request can
+   * be checked against who owns the application it belongs to.
+   */
+  async findByStorageKey(storageKey: string) {
+    const conn = await db();
+    const rows = await conn
+      .select()
+      .from(documents)
+      .where(eq(documents.storageKey, storageKey))
+      .limit(1);
+    return rows[0];
+  },
+
   async remove(id: number) {
     const conn = await db();
     await conn.delete(documents).where(eq(documents.id, id));
