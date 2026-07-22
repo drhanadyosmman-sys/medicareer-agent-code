@@ -2,6 +2,7 @@
 // Design: Navy/teal premium medical aesthetic. Staff workspace tools are internal only.
 
 import { useState, useEffect } from 'react';
+import { trpc } from '@/lib/trpc';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,7 +95,7 @@ const WORKSPACE_OUTPUTS: Record<string, (app: DoctorApplication) => string> = {
 
 export default function AdminApplications() {
   const { t } = useLanguage();
-  const [applications, setApplications] = useState(store.getApplications());
+  const [applications, setApplications] = useState<DoctorApplication[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStage, setFilterStage] = useState('all');
   const [selectedApp, setSelectedApp] = useState<DoctorApplication | null>(null);
@@ -105,7 +106,50 @@ export default function AdminApplications() {
   const [showOutput, setShowOutput] = useState(false);
   const [profileTab, setProfileTab] = useState('profile');
 
-  const refreshApplications = () => setApplications(store.getApplications());
+  // Fetch applications from the real backend
+  const { data: dbApps, refetch } = trpc.applications.listAll.useQuery();
+
+  useEffect(() => {
+    if (dbApps) {
+      const mapped: DoctorApplication[] = dbApps.map((app: any) => ({
+        id: String(app.id),
+        userId: String(app.userId),
+        status: app.status,
+        readinessScore: app.readinessScore,
+        createdAt: app.createdAt ? new Date(app.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: app.updatedAt ? new Date(app.updatedAt).toISOString() : new Date().toISOString(),
+        fullName: app.fullName,
+        email: app.email,
+        whatsapp: app.whatsapp || '',
+        countryOfResidence: app.countryOfResidence || '',
+        nationality: app.nationality || '',
+        preferredPathway: app.preferredPathway || '',
+        medicalSchool: app.medicalSchool || '',
+        graduationYear: app.graduationYear || '',
+        internshipCompleted: app.internshipCompleted,
+        yearsExperience: app.yearsExperience || '',
+        currentRole: app.currentRole || '',
+        specialtyInterest: app.specialtyInterest || '',
+        currentCountryOfPractice: app.currentCountryOfPractice || '',
+        gmcStatus: app.gmcStatus || '',
+        plabStatus: app.plabStatus || '',
+        ieltsOetStatus: app.ieltsOetStatus || '',
+        alsBlsStatus: app.alsBlsStatus || '',
+        nhsExperience: app.nhsExperience,
+        previousUkApplications: app.previousUkApplications,
+        previousInterviews: app.previousInterviews,
+        careerStory: app.careerStory || '',
+        documents: [],
+        messages: [],
+        adminNotes: [],
+        missingDocuments: (app.missingDocuments as string[]) || [],
+        recommendedSteps: (app.recommendedSteps as string[]) || [],
+      }));
+      setApplications(mapped);
+    }
+  }, [dbApps]);
+
+  const refreshApplications = () => { refetch(); };
 
   // Total unread messages from users
   const totalUnread = applications.reduce((sum, app) => {

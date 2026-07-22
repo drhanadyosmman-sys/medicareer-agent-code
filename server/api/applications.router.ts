@@ -12,6 +12,7 @@ import {
   documentsRepo,
   messagesRepo,
 } from "../repos";
+import { storagePut } from "../storage";
 
 const applicationInput = z.object({
   fullName: z.string().trim().min(1).max(255),
@@ -136,6 +137,41 @@ export const applicationsRouter = router({
     .query(async ({ input, ctx }) => {
       await loadOwned(input.applicationId, ctx.user);
       return documentsRepo.listForApplication(input.applicationId);
+    }),
+
+  /**
+   * Upload a file (base64) to S3 and record it in the documents table.
+   * Accepts the raw file bytes encoded as base64 from the client.
+   */
+  uploadDocument: protectedProcedure
+    .input(
+      z.object({
+        applicationId: z.number().int().positive(),
+        category: z.enum(DOCUMENT_CATEGORIES),
+        name: z.string().trim().min(1).max(255),
+        mimeType: z.string().trim().max(127).optional(),
+        sizeBytes: z.number().int().positive().max(20 * 1024 * 1024),
+        base64: z.string().describe("Base64-encoded file content (no data: prefix)"),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await loadOwned(input.applicationId, ctx.user);
+      const buffer = Buffer.from(input.base64, "base64");
+      const key = `applications/${input.applicationId}/${input.category}/${input.name}`;
+      const { key: storageKey, url } = await storagePut(
+        key,
+        buffer,
+        input.mimeType || "application/octet-stream"
+      );
+      await documentsRepo.create({
+        applicationId: input.applicationId,
+        category: input.category,
+        name: input.name,
+        mimeType: input.mimeType,
+        sizeBytes: input.sizeBytes,
+        storageKey,
+      });
+      return { success: true, storageKey, url } as const;
     }),
 
   /**

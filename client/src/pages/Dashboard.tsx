@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { store, DoctorApplication, DocumentFile } from '@/lib/store';
+import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import ChatPanel from '@/components/ChatPanel';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -65,19 +66,59 @@ export default function Dashboard() {
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
+  // Fetch applications from the real backend
+  const { data: myApps, isLoading: appsLoading } = trpc.applications.mine.useQuery(
+    undefined,
+    { enabled: isAuthenticated }
+  );
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-    if (user) {
-      // Auth is server-backed now, but applications still live in this browser's
-      // localStorage, which is keyed by string. Until they move to the
-      // applications API the server's numeric id is used as that key.
-      const app = store.getApplicationByUserId(String(user.id));
-      if (app) setApplication(app);
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (myApps && myApps.length > 0) {
+      const app = myApps[0];
+      // Map server data to the DoctorApplication shape the UI expects
+      setApplication({
+        id: String(app.id),
+        userId: String(app.userId),
+        status: app.status as any,
+        readinessScore: app.readinessScore,
+        createdAt: app.createdAt ? new Date(app.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: app.updatedAt ? new Date(app.updatedAt).toISOString() : new Date().toISOString(),
+        fullName: app.fullName,
+        email: app.email,
+        whatsapp: app.whatsapp || '',
+        countryOfResidence: app.countryOfResidence || '',
+        nationality: app.nationality || '',
+        preferredPathway: app.preferredPathway || '',
+        medicalSchool: app.medicalSchool || '',
+        graduationYear: app.graduationYear || '',
+        internshipCompleted: app.internshipCompleted,
+        yearsExperience: app.yearsExperience || '',
+        currentRole: app.currentRole || '',
+        specialtyInterest: app.specialtyInterest || '',
+        currentCountryOfPractice: app.currentCountryOfPractice || '',
+        gmcStatus: app.gmcStatus || '',
+        plabStatus: app.plabStatus || '',
+        ieltsOetStatus: app.ieltsOetStatus || '',
+        alsBlsStatus: app.alsBlsStatus || '',
+        nhsExperience: app.nhsExperience,
+        previousUkApplications: app.previousUkApplications,
+        previousInterviews: app.previousInterviews,
+        careerStory: app.careerStory || '',
+        documents: [],
+        messages: [],
+        adminNotes: [],
+        missingDocuments: (app.missingDocuments as string[]) || [],
+        recommendedSteps: (app.recommendedSteps as string[]) || [],
+      });
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [myApps]);
 
   // Unread message count
   const unreadCount = application?.messages.filter(m => m.from === 'admin' && !m.read).length ?? 0;

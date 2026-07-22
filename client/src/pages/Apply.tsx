@@ -79,6 +79,8 @@ export default function Apply() {
   const [uploadingCategory, setUploadingCategory] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const requestLoginLink = trpc.auth.requestLoginLink.useMutation();
+  const submitApplication = trpc.applications.submit.useMutation();
+  const uploadDocument = trpc.applications.uploadDocument.useMutation();
 
   const updateForm = (field: string, value: string | boolean) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -181,61 +183,75 @@ export default function Apply() {
       }
     }
 
-    const appId = `app-${Date.now()}`;
+    // Submit application to the real backend (database)
+    try {
+      const result = await submitApplication.mutateAsync({
+        fullName: form.fullName,
+        email: form.email,
+        whatsapp: form.whatsapp || undefined,
+        countryOfResidence: form.countryOfResidence || undefined,
+        nationality: form.nationality || undefined,
+        preferredPathway: form.preferredPathway || undefined,
+        medicalSchool: form.medicalSchool || undefined,
+        graduationYear: form.graduationYear || undefined,
+        internshipCompleted: form.internshipCompleted === 'yes',
+        yearsExperience: form.yearsExperience || undefined,
+        currentRole: form.currentRole || undefined,
+        specialtyInterest: form.specialtyInterest || undefined,
+        currentCountryOfPractice: form.currentCountryOfPractice || undefined,
+        gmcStatus: form.gmcStatus || undefined,
+        plabStatus: form.plabStatus || undefined,
+        ieltsOetStatus: form.ieltsOetStatus || undefined,
+        alsBlsStatus: form.alsBlsStatus || undefined,
+        nhsExperience: form.nhsExperience === 'yes',
+        previousUkApplications: form.previousUkApplications === 'yes',
+        previousInterviews: form.previousInterviews === 'yes',
+        careerStory: form.careerStory || undefined,
+        readinessScore: calculateReadiness(),
+        missingDocuments: getMissingDocs(),
+        recommendedSteps: getRecommendedSteps(),
+      });
 
-    const application = {
-      id: appId,
-      userId: String(accountId),
-      status: 'submitted' as const,
-      readinessScore: calculateReadiness(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      fullName: form.fullName,
-      email: form.email,
-      whatsapp: form.whatsapp,
-      countryOfResidence: form.countryOfResidence,
-      nationality: form.nationality,
-      preferredPathway: form.preferredPathway,
-      medicalSchool: form.medicalSchool,
-      graduationYear: form.graduationYear,
-      internshipCompleted: form.internshipCompleted === 'yes',
-      yearsExperience: form.yearsExperience,
-      currentRole: form.currentRole,
-      specialtyInterest: form.specialtyInterest,
-      currentCountryOfPractice: form.currentCountryOfPractice,
-      gmcStatus: form.gmcStatus,
-      plabStatus: form.plabStatus,
-      ieltsOetStatus: form.ieltsOetStatus,
-      alsBlsStatus: form.alsBlsStatus,
-      nhsExperience: form.nhsExperience === 'yes',
-      previousUkApplications: form.previousUkApplications === 'yes',
-      previousInterviews: form.previousInterviews === 'yes',
-      careerStory: form.careerStory,
-      documents: uploadedFiles,
-      messages: [
-        {
-          id: `msg-${Date.now()}`,
-          from: 'admin' as const,
-          content: `Thank you for submitting your application, ${form.fullName}. Our career consultant has received your profile and will begin reviewing your documents within 48 hours. We will be in touch shortly with our initial assessment.`,
-          createdAt: new Date().toISOString(),
-          read: false,
+      const applicationId = result.id;
+
+      // Upload files to S3 in parallel
+      const uploadPromises = uploadedFiles.map(async (file) => {
+        const dataUrl = store.getFileData(file.id);
+        if (!dataUrl) return;
+        // Strip the data:...;base64, prefix
+        const base64 = dataUrl.split(',')[1];
+        if (!base64) return;
+        try {
+          await uploadDocument.mutateAsync({
+            applicationId,
+            category: (file.category || 'other') as any,
+            name: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            sizeBytes: parseInt(file.size) || 1,
+            base64,
+          });
+        } catch (err) {
+          console.error(`Failed to upload ${file.name}:`, err);
         }
-      ],
-      adminNotes: [],
-      missingDocuments: getMissingDocs(),
-      recommendedSteps: getRecommendedSteps(),
-    };
+      });
+      await Promise.all(uploadPromises);
 
-    store.addApplication(application);
-    setSubmitting(false);
+      // Clean up localStorage file data
+      uploadedFiles.forEach(f => store.deleteFileData(f.id));
 
-    // Redirect to checkout with plan details from URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const planId = urlParams.get('plan') || 'standard';
-    const planName = urlParams.get('planName') || 'Standard Package';
-    const price = urlParams.get('price') || '299';
-    toast.success(lang === 'ar' ? 'تم إرسال الطلب! جاري التحويل للدفع...' : 'Application submitted! Redirecting to payment...');
-    setTimeout(() => navigate(`/checkout?plan=${planId}&planName=${encodeURIComponent(planName)}&price=${price}`), 1000);
+      setSubmitting(false);
+
+      // Redirect to checkout with plan details from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const planId = urlParams.get('plan') || 'standard';
+      const planName = urlParams.get('planName') || 'Standard Package';
+      const price = urlParams.get('price') || '299';
+      toast.success(lang === 'ar' ? 'تم إرسال الطلب! جاري التحويل للدفع...' : 'Application submitted! Redirecting to payment...');
+      setTimeout(() => navigate(`/checkout?plan=${planId}&planName=${encodeURIComponent(planName)}&price=${price}`), 1000);
+    } catch (error) {
+      toast.error(readableError(error));
+      setSubmitting(false);
+    }
   };
 
   const calculateReadiness = (): number => {
