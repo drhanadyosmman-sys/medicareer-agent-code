@@ -151,6 +151,11 @@ export default function AdminApplications() {
 
   const refreshApplications = () => { refetch(); };
 
+  // tRPC mutations for admin operations
+  const setStatusMutation = trpc.applications.setStatus.useMutation({ onSuccess: () => refetch() });
+  const addNoteMutation = trpc.applications.addAdminNote.useMutation({ onSuccess: () => refetch() });
+  const sendMessageMutation = trpc.applications.sendMessage.useMutation({ onSuccess: () => refetch() });
+
   // Total unread messages from users
   const totalUnread = applications.reduce((sum, app) => {
     return sum + app.messages.filter(m => m.from === 'user' && !m.read).length;
@@ -172,39 +177,35 @@ export default function AdminApplications() {
 
 
   const changeStage = (appId: string, newStage: string) => {
-    store.updateApplication(appId, { status: newStage as any });
-    refreshApplications();
-    const app = applications.find(a => a.id === appId);
+    const numericId = parseInt(appId);
+    if (!numericId) return;
+    setStatusMutation.mutate({ id: numericId, status: newStage as any });
     if (selectedApp?.id === appId) {
       setSelectedApp(prev => prev ? { ...prev, status: newStage as any } : null);
-    }
-    if (app?.email) {
     }
     toast.success(`Stage updated to: ${STAGE_LABELS[newStage]}`);
   };
 
   const addNote = () => {
     if (!newNote.trim() || !selectedApp) return;
+    const numericId = parseInt(selectedApp.id);
+    if (!numericId) return;
+    addNoteMutation.mutate({ applicationId: numericId, content: newNote, type: 'general' });
+    // Optimistic update
     const note = { id: `note-${Date.now()}`, content: newNote, createdAt: new Date().toISOString(), type: 'general' as const };
-    const updatedNotes = [...selectedApp.adminNotes, note];
-    store.updateApplication(selectedApp.id, { adminNotes: updatedNotes });
-    setSelectedApp(prev => prev ? { ...prev, adminNotes: updatedNotes } : null);
-    refreshApplications();
+    setSelectedApp(prev => prev ? { ...prev, adminNotes: [...prev.adminNotes, note] } : null);
     setNewNote('');
     toast.success('Note added');
   };
 
-  const handleDownloadDocument = (doc: { id: string; name: string }) => {
-    const dataUrl = store.getFileData(doc.id);
-    if (!dataUrl) {
-      toast.info('This is a demo document — no actual file data stored for pre-loaded documents.');
-      return;
+  const handleDownloadDocument = (doc: { id: string; name: string; storageKey?: string }) => {
+    if (doc.storageKey) {
+      // Download from S3 via the secure storage route
+      window.open(`/manus-storage/${doc.storageKey}`, '_blank');
+      toast.success(`Downloading ${doc.name}`);
+    } else {
+      toast.info('No file data available for this document.');
     }
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = doc.name;
-    link.click();
-    toast.success(`Downloading ${doc.name}`);
   };
 
   const runWorkspaceTool = (toolKey: string, label: string) => {
@@ -215,9 +216,13 @@ export default function AdminApplications() {
       setGeneratedOutput(output);
       setShowOutput(true);
       setGeneratingTool(null);
+      // Save note to DB
+      const numericId = parseInt(selectedApp.id);
+      if (numericId) {
+        addNoteMutation.mutate({ applicationId: numericId, content: output, type: toolKey as any });
+      }
       const note = { id: `note-${Date.now()}`, content: output, createdAt: new Date().toISOString(), type: toolKey as any };
       const updatedNotes = [...selectedApp.adminNotes, note];
-      store.updateApplication(selectedApp.id, { adminNotes: updatedNotes });
       setSelectedApp(prev => prev ? { ...prev, adminNotes: updatedNotes } : null);
       refreshApplications();
       toast.success(`${label} — Complete`);
@@ -530,16 +535,18 @@ export default function AdminApplications() {
           <div className="flex gap-2 mt-4">
             <Button onClick={() => { navigator.clipboard.writeText(generatedOutput); toast.success('Copied to clipboard'); }} variant="outline" className="btn-press">Copy</Button>
             <Button
-              onClick={() => {
+              onClick={async () => {
                 if (!selectedApp) return;
-                const msg = { id: `msg-${Date.now()}`, from: 'admin' as const, content: generatedOutput, createdAt: new Date().toISOString(), read: false };
-                const updatedMessages = [...selectedApp.messages, msg];
-                store.updateApplication(selectedApp.id, { messages: updatedMessages });
-                setSelectedApp(prev => prev ? { ...prev, messages: updatedMessages } : null);
-                refreshApplications();
-                setShowOutput(false);
-                setProfileTab('messages');
-                toast.success('Sent to applicant');
+                const numericId = parseInt(selectedApp.id);
+                if (!numericId) return;
+                try {
+                  await sendMessageMutation.mutateAsync({ applicationId: numericId, content: generatedOutput });
+                  setShowOutput(false);
+                  setProfileTab('messages');
+                  toast.success('Sent to applicant');
+                } catch {
+                  toast.error('Failed to send message');
+                }
               }}
               className="bg-teal hover:bg-teal/90 text-white btn-press"
             >

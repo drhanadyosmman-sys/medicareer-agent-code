@@ -252,6 +252,40 @@ export const applicationsRouter = router({
       const existing = await applicationsRepo.findById(input.id);
       if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Application not found" });
       await applicationsRepo.update(input.id, { status: input.status });
+
+      // Send email notification to the doctor about status change
+      const statusLabels: Record<string, string> = {
+        submitted: "Submitted",
+        "under-review": "Under Review",
+        "cv-optimization": "CV Optimisation in Progress",
+        "job-matching": "Job Matching in Progress",
+        "applications-prepared": "Applications Prepared & Submitted",
+        "interview-preparation": "Interview Preparation Stage",
+      };
+      const label = statusLabels[input.status] || input.status;
+      sendEmail({
+        to: existing.email,
+        subject: `Application Update: ${label} \u2014 MediCareer Agent`,
+        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+          <div style="background:linear-gradient(135deg,#0a1628,#0d2040);padding:24px 32px;border-radius:12px 12px 0 0;text-align:center;">
+            <h1 style="color:#fff;margin:0;font-size:20px;">MediCareer Agent</h1>
+            <p style="color:#14b8a6;margin:4px 0 0;font-size:12px;text-transform:uppercase;">Application Status Update</p>
+          </div>
+          <div style="padding:28px 32px;background:#fff;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 12px 12px;">
+            <p style="margin:0 0 16px;">Dear ${existing.fullName},</p>
+            <p style="margin:0 0 16px;">Your application status has been updated:</p>
+            <div style="background:#f0fdf9;border-left:4px solid #14b8a6;padding:16px;border-radius:6px;margin:16px 0;">
+              <p style="margin:0;font-weight:bold;color:#0f766e;">New Status: ${label}</p>
+            </div>
+            <p style="margin:16px 0;">Log in to your dashboard to see full details and any actions required.</p>
+            <p style="text-align:center;margin:24px 0;"><a href="https://agent.hcqsai.uk/dashboard" style="background:#14b8a6;color:#fff;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:600;">View Dashboard</a></p>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
+            <p style="font-size:12px;color:#64748b;margin:0;">Questions? Reply to this email or contact <a href="mailto:support@hcqsai.uk" style="color:#14b8a6;">support@hcqsai.uk</a></p>
+          </div>
+        </div>`,
+        text: `Dear ${existing.fullName}, your application status has been updated to: ${label}. Log in to https://agent.hcqsai.uk/dashboard for details.`,
+      }).catch(err => console.error("[Email] Status notification failed:", err));
+
       return { success: true } as const;
     }),
 
