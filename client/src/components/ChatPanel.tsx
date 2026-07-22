@@ -5,8 +5,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { store, Message, DoctorApplication } from '@/lib/store';
-
+import { trpc } from '@/lib/trpc';
+import { Message, DoctorApplication } from '@/lib/store';
 import { Send, CheckCheck, Check } from 'lucide-react';
 
 interface ChatPanelProps {
@@ -54,19 +54,37 @@ export default function ChatPanel({ application, viewerRole, onUpdate, compact =
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const applicationId = parseInt(application.id);
+  const isValidId = !isNaN(applicationId) && applicationId > 0;
+
+  // tRPC mutations
+  const sendMessageMutation = trpc.applications.sendMessage.useMutation();
+  const markReadMutation = trpc.applications.markMessagesRead.useMutation();
+
+  // Fetch messages from server
+  const { data: serverApp } = trpc.applications.byId.useQuery(
+    { id: applicationId },
+    { enabled: isValidId, refetchInterval: 10000 } // Poll every 10s for new messages
+  );
+
+  // Sync server messages to local state
+  useEffect(() => {
+    if (serverApp?.messages) {
+      const mapped: Message[] = serverApp.messages.map((m: any) => ({
+        id: String(m.id),
+        from: m.sender as 'admin' | 'user',
+        content: m.content,
+        createdAt: m.createdAt ? new Date(m.createdAt).toISOString() : '',
+        read: !!m.readAt,
+      }));
+      setMessages(mapped);
+    }
+  }, [serverApp?.messages]);
+
   // Mark messages as read when panel opens
   useEffect(() => {
-    const unreadFrom = viewerRole === 'admin' ? 'user' : 'admin';
-    const hasUnread = messages.some(m => m.from === unreadFrom && !m.read);
-    if (hasUnread) {
-      store.markMessagesRead(application.id, unreadFrom);
-      const updatedMessages = messages.map(m =>
-        m.from === unreadFrom ? { ...m, read: true } : m
-      );
-      setMessages(updatedMessages);
-      if (onUpdate) {
-        onUpdate({ ...application, messages: updatedMessages });
-      }
+    if (isValidId) {
+      markReadMutation.mutate({ applicationId });
     }
   }, []);
 
@@ -75,27 +93,33 @@ export default function ChatPanel({ application, viewerRole, onUpdate, compact =
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-
-  const sendMessage = () => {
-    if (!newMessage.trim() || sending) return;
+  const sendMessage = async () => {
+    if (!newMessage.trim() || sending || !isValidId) return;
     setSending(true);
     const msgContent = newMessage.trim();
-    const msg: Message = {
-      id: `msg-${Date.now()}`,
+
+    // Optimistic update
+    const optimisticMsg: Message = {
+      id: `temp-${Date.now()}`,
       from: viewerRole,
       content: msgContent,
       createdAt: new Date().toISOString(),
       read: false,
     };
-    const updatedMessages = [...messages, msg];
-    store.updateApplication(application.id, { messages: updatedMessages });
-    setMessages(updatedMessages);
+    setMessages(prev => [...prev, optimisticMsg]);
     setNewMessage('');
-    setSending(false);
 
-    if (onUpdate) {
-      onUpdate({ ...application, messages: updatedMessages });
+    try {
+      await sendMessageMutation.mutateAsync({
+        applicationId,
+        content: msgContent,
+      });
+    } catch (err) {
+      // Remove optimistic message on failure
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
+      setNewMessage(msgContent);
     }
+    setSending(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -110,7 +134,6 @@ export default function ChatPanel({ application, viewerRole, onUpdate, compact =
     m.from === (viewerRole === 'admin' ? 'user' : 'admin') && !m.read
   ).length;
 
-  const senderName = viewerRole === 'admin' ? 'You' : 'You';
   const receiverName = viewerRole === 'admin' ? application.fullName : 'Career Consultant';
 
   return (

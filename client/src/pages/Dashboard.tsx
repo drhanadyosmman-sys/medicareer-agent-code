@@ -147,6 +147,12 @@ export default function Dashboard() {
   // Unread message count
   const unreadCount = application?.messages.filter(m => m.from === 'admin' && !m.read).length ?? 0;
 
+  // Eligibility check from server
+  const { data: eligibility } = trpc.applications.checkEligibility.useQuery(
+    { applicationId: appId! },
+    { enabled: !!appId }
+  );
+
   const handleUploadDocument = (category: string, accept: string) => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -306,6 +312,78 @@ export default function Dashboard() {
           <TabsContent value="overview">
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
+                {/* UK NHS Eligibility Assessment */}
+                {eligibility && (
+                  <Card className="border-0 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="font-serif text-lg text-navy flex items-center gap-2">
+                        {eligibility.overallStatus === 'eligible' ? <CheckCircle className="w-5 h-5 text-green-500" /> :
+                         eligibility.overallStatus === 'conditionally-eligible' ? <Clock className="w-5 h-5 text-amber-500" /> :
+                         <AlertCircle className="w-5 h-5 text-red-500" />}
+                        {lang === 'ar' ? 'تقييم الأهلية للعمل في NHS' : 'UK NHS Eligibility Assessment'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {/* Overall status badge */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <Badge className={`text-sm px-3 py-1 ${
+                          eligibility.overallStatus === 'eligible' ? 'bg-green-100 text-green-700' :
+                          eligibility.overallStatus === 'conditionally-eligible' ? 'bg-amber-100 text-amber-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {eligibility.overallStatus === 'eligible' ? (lang === 'ar' ? 'مؤهل' : 'Eligible') :
+                           eligibility.overallStatus === 'conditionally-eligible' ? (lang === 'ar' ? 'مؤهل بشروط' : 'Conditionally Eligible') :
+                           (lang === 'ar' ? 'غير مؤهل حالياً' : 'Not Yet Eligible')}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">{eligibility.summary}</span>
+                      </div>
+
+                      {/* Individual checks */}
+                      <div className="space-y-3">
+                        {eligibility.checks.map((check: any, i: number) => (
+                          <div key={i} className={`p-3 rounded-lg border ${
+                            check.status === 'met' ? 'bg-green-50 border-green-200' :
+                            check.status === 'partially-met' ? 'bg-amber-50 border-amber-200' :
+                            check.status === 'not-met' ? 'bg-red-50 border-red-200' :
+                            'bg-gray-50 border-gray-200'
+                          }`}>
+                            <div className="flex items-center gap-2 mb-1">
+                              {check.status === 'met' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
+                               check.status === 'partially-met' ? <Clock className="w-4 h-4 text-amber-600" /> :
+                               <AlertCircle className="w-4 h-4 text-red-600" />}
+                              <span className="font-medium text-sm">{check.title}</span>
+                              <Badge variant="outline" className="text-xs ml-auto">
+                                {check.category === 'visa' ? (lang === 'ar' ? 'تأشيرة' : 'Visa') :
+                                 check.category === 'degree' ? (lang === 'ar' ? 'الدرجة' : 'Degree') :
+                                 (lang === 'ar' ? 'GMC' : 'GMC')}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground ml-6">{check.detail}</p>
+                            {check.action && (
+                              <p className="text-xs font-medium text-navy ml-6 mt-1">→ {check.action}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Next steps */}
+                      {eligibility.nextSteps.length > 0 && eligibility.overallStatus !== 'eligible' && (
+                        <div className="mt-4 p-3 bg-navy/5 rounded-lg">
+                          <p className="text-xs font-semibold text-navy mb-2">{lang === 'ar' ? 'الخطوات التالية:' : 'Next Steps:'}</p>
+                          <ul className="space-y-1">
+                            {eligibility.nextSteps.map((step: string, i: number) => (
+                              <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                                <span className="text-teal font-bold mt-0.5">{i + 1}.</span>
+                                <span>{step}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Readiness Score */}
                 <Card className="border-0 shadow-sm">
                   <CardHeader className="pb-3">

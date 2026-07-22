@@ -14,6 +14,8 @@ import {
 } from "../repos";
 import { storagePut } from "../storage";
 import { evaluateEligibility } from "../eligibility";
+import { sendEmail } from "../email";
+import { ENV } from "../_core/env";
 
 const applicationInput = z.object({
   fullName: z.string().trim().min(1).max(255),
@@ -95,6 +97,26 @@ export const applicationsRouter = router({
         sender: "admin",
         content: `Thank you for submitting your application, ${input.fullName}. Our career consultant has received your profile and will begin reviewing your documents within 48 hours.`,
       });
+
+      // Send admin notification email (fire-and-forget)
+      const adminEmail = ENV.adminEmails[0] || "healthcarequalityschool@gmail.com";
+      sendEmail({
+        to: adminEmail,
+        subject: `New Application: ${input.fullName} — ${input.specialtyInterest || "General"}`,
+        html: `<h2>New Application Received</h2>
+          <p>A new doctor has submitted an application on MediCareer Agent:</p>
+          <table style="border-collapse:collapse;width:100%;max-width:500px;">
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.fullName}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.email}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Specialty</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.specialtyInterest || "Not specified"}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Nationality</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.nationality || "Not specified"}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">GMC Status</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.gmcStatus || "Not specified"}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">WhatsApp</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.whatsapp || "Not provided"}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Readiness Score</td><td style="padding:8px;border-bottom:1px solid #eee;">${input.readinessScore}%</td></tr>
+          </table>
+          <p style="margin-top:20px;"><a href="https://agent.hcqsai.uk/admin/applications" style="background:#14b8a6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;">Review in Admin Panel</a></p>`,
+        text: `New Application: ${input.fullName} (${input.email}) — Specialty: ${input.specialtyInterest || "N/A"}, Nationality: ${input.nationality || "N/A"}, GMC: ${input.gmcStatus || "N/A"}, Score: ${input.readinessScore}%`,
+      }).catch(err => console.error("[Email] Admin notification failed:", err));
 
       return { id };
     }),
