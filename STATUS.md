@@ -1,10 +1,30 @@
 # MediCareer Agent — status
 
-Last updated 20 July 2026. This branch (`apply-fixes`) is verified but **not yet merged
-or deployed**. The live site still runs the old build.
+Last updated 20 July 2026. **Merged to `main` and deployed.** Live on
+`agent.hcqsai.uk`, database connected.
 
-Verified on this exact tree: `tsc --noEmit` passes, **78 tests** pass, `vite build`
-succeeds, and the app was driven in a browser.
+Verified against the deployed site, not just locally: the `require()` crash is gone from
+the shipped bundle, the fabricated figures and testimonials return zero matches, the page
+title renders a real em dash, and `auth.requestLoginLink` reaches the database.
+
+---
+
+## Picking this up on another machine
+
+Everything needed lives in this repository. On a new computer:
+
+1. Install [Node.js](https://nodejs.org) 20 or newer, and [Git](https://git-scm.com).
+2. `git clone https://github.com/drhanadyosmman-sys/medicareer-agent-code.git`
+3. `cd medicareer-agent-code && npm install -g pnpm && pnpm install`
+4. Read this file — it is the handover.
+
+What does **not** travel between machines: the Claude Code conversation history and its
+local memory. That is why decisions and reasoning are written down here and in the commit
+messages rather than left in a chat log. `git log` is the other half of the story — each
+commit explains why, not just what.
+
+Secrets are not in the repository and must not be. They live in Manus → Settings →
+Secrets; see the table below.
 
 ---
 
@@ -62,34 +82,43 @@ fails exactly 5 tests; removing single-use link enforcement fails exactly 1.
 
 ---
 
-## Still to do, in order
+## Secrets (all set, 20 July 2026)
 
-**1. Set five secrets** in Manus -> Settings -> Secrets
+Held in Manus -> Settings -> Secrets. Never in this repository.
 
-| Variable | Where it comes from |
+| Variable | What it is |
 |---|---|
-| `DATABASE_URL` | Manus database panel |
-| `JWT_SECRET` | any long random string |
-| `ADMIN_EMAILS` | the owner's email — see note below |
-| `RESEND_API_KEY` | resend.com -> API Keys -> Create (sending access only) |
+| `DATABASE_URL` | MySQL connection string, provisioned by Manus |
+| `JWT_SECRET` | signs session cookies |
+| `ADMIN_EMAILS` | comma-separated; these addresses get admin on sign-in |
+| `RESEND_API_KEY` | sends the email sign-in links |
 | `EMAIL_FROM` | `MediCareer Agent <no-reply@hcqsai.uk>` |
 
 `ADMIN_EMAILS` is load-bearing: roles default to `user` and only an admin can grant
 admin, so **without it nobody can reach `/admin`, including the owner**. Any listed email
-is promoted on register or sign-in. It never demotes.
+is promoted on register or sign-in. It never demotes, so removing an entry does not lock
+someone out mid-session.
 
-**2. Merge `apply-fixes` into `main`**
+Migrations `0001` and `0002` have been applied. Both are additive; `0001` adds a unique
+index on `users.email`, so duplicate emails would have to be cleared before it can run on
+any other database.
 
-**3. Run the migrations** — `pnpm db:push`, or apply `0001` then `0002`.
+---
 
-Caveat: `0001` adds a unique index on `users.email`. If two rows already share an email
-that statement fails and the duplicate must be cleared first.
+## Still to do
 
-**4. Publish from Manus**
+**Rotate the Resend API key.** A key named `agent` was pasted into a chat transcript on
+20 July and should be treated as exposed. Create a replacement at resend.com (sending
+access only), set it as `RESEND_API_KEY` in Manus, and only then delete `agent` — deleting
+it first would stop sign-in emails.
 
-**5. Register with the `ADMIN_EMAILS` address** — that becomes the admin login.
+**Move the Apply form and Dashboard onto the applications API.** They still read and write
+`localStorage`, so a doctor's submitted application never reaches the business. The API
+they need exists and is tested; the missing piece is file upload to object storage. This
+is the largest remaining gap between "the site works" and "the service works".
 
-Without step 1 the public pages work, but sign-in reports "Database is not configured".
+**Consider a real photograph of the team** for the "Who is behind this" section. It has no
+image by design — see the comment in `Home.tsx`.
 
 ---
 
