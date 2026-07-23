@@ -14,6 +14,14 @@
 export interface EligibilityInput {
   nationality?: string;
   countryOfResidence?: string;
+  /**
+   * Explicit answer to "do you already have the right to work in the UK?"
+   * (settled/pre-settled status, ILR, spouse visa, etc). Residence is NOT this:
+   * living in the UK on a visit or student visa is not a right to work, and
+   * treating it as one sends doctors to apply for jobs that will never sponsor
+   * them. When set, this overrides any inference from nationality.
+   */
+  ukRightToWork?: boolean;
   medicalSchool?: string;
   graduationYear?: string;
   gmcStatus?: string;
@@ -42,45 +50,59 @@ export interface EligibilityResult {
   nextSteps: string[];
 }
 
-// Countries whose nationals have automatic right to work in the UK (no visa needed)
+// Nationalities with an automatic right to work in the UK (no visa needed).
+// These are whole-word tokens, matched with word boundaries - NOT substrings.
+// A substring match here is dangerous: "uk" is inside "Ukraine", "us" is inside
+// "Russian", so `residence.includes("uk")` told Ukrainian and Russian doctors
+// they had UK work rights or GMC-exempt degrees. Always match whole words.
 const UK_RIGHT_TO_WORK_COUNTRIES = [
-  "united kingdom", "uk", "british", "ireland", "irish",
+  "united kingdom", "uk", "britain", "british", "ireland", "irish",
 ];
 
-// EEA/EU nationals still need to apply but have simplified routes
+// EEA/EU nationals still need to apply but have simplified routes.
 const EEA_COUNTRIES = [
-  "austria", "belgium", "bulgaria", "croatia", "cyprus", "czech republic",
-  "denmark", "estonia", "finland", "france", "germany", "greece", "hungary",
-  "iceland", "italy", "latvia", "liechtenstein", "lithuania", "luxembourg",
-  "malta", "netherlands", "norway", "poland", "portugal", "romania",
-  "slovakia", "slovenia", "spain", "sweden", "swiss", "switzerland",
+  "austria", "belgium", "bulgaria", "croatia", "cyprus", "czech republic", "czechia",
+  "denmark", "estonia", "finland", "france", "french", "germany", "german", "greece",
+  "greek", "hungary", "iceland", "italy", "italian", "latvia", "liechtenstein",
+  "lithuania", "luxembourg", "malta", "netherlands", "dutch", "norway", "poland",
+  "polish", "portugal", "portuguese", "romania", "romanian", "slovakia", "slovenia",
+  "spain", "spanish", "sweden", "swedish", "switzerland", "swiss",
 ];
 
-// Countries with GMC-recognised primary medical qualifications (no PLAB needed)
-// These are "acceptable overseas qualifications" per GMC guidance
-const GMC_EXEMPT_COUNTRIES = [
-  "australia", "new zealand", "canada", "united states", "usa", "us",
-  "singapore", "hong kong", "south africa", "west indies",
-];
+/**
+ * Whether a free-text country/nationality field contains any of the given
+ * tokens as a WHOLE WORD. Splitting on non-letters means "Russian" no longer
+ * matches "us" and "Ukraine" no longer matches "uk", while "United Kingdom"
+ * still matches "united kingdom".
+ */
+function mentionsCountry(field: string | undefined, tokens: string[]): boolean {
+  const text = (field || "").toLowerCase();
+  if (!text.trim()) return false;
+  const words = text.split(/[^a-z]+/).filter(Boolean);
+  const joined = ` ${words.join(" ")} `;
+  return tokens.some(token => joined.includes(` ${token} `));
+}
 
 export function evaluateEligibility(input: EligibilityInput): EligibilityResult {
   const checks: EligibilityCheck[] = [];
   const nextSteps: string[] = [];
 
   // ─── 1. VISA ELIGIBILITY ───────────────────────────────────────────────────
-  const nationalityLower = (input.nationality || "").toLowerCase().trim();
-  const residenceLower = (input.countryOfResidence || "").toLowerCase().trim();
+  // Nationality can imply a right to work; residence never does on its own.
+  const nationalityHasRightToWork = mentionsCountry(input.nationality, UK_RIGHT_TO_WORK_COUNTRIES);
 
   let visaCheck: EligibilityCheck;
 
-  if (UK_RIGHT_TO_WORK_COUNTRIES.some(c => nationalityLower.includes(c) || residenceLower.includes(c))) {
+  if (input.ukRightToWork === true || nationalityHasRightToWork) {
     visaCheck = {
       category: "visa",
       title: "UK Work Authorisation",
       status: "met",
-      detail: "As a UK/Irish national, you have automatic right to work in the UK. No visa sponsorship required.",
+      detail: input.ukRightToWork === true && !nationalityHasRightToWork
+        ? "You have told us you already hold the right to work in the UK. No visa sponsorship required."
+        : "As a UK/Irish national, you have the right to work in the UK. No visa sponsorship required.",
     };
-  } else if (EEA_COUNTRIES.some(c => nationalityLower.includes(c))) {
+  } else if (mentionsCountry(input.nationality, EEA_COUNTRIES)) {
     visaCheck = {
       category: "visa",
       title: "UK Work Authorisation",
@@ -98,7 +120,7 @@ export function evaluateEligibility(input: EligibilityInput): EligibilityResult 
       action: "You will need: (1) A confirmed job offer from a licensed sponsor, (2) Certificate of Sponsorship, (3) Proof of English language ability, (4) Minimum salary threshold (currently met by all NHS doctor roles).",
     };
     nextSteps.push("Obtain a job offer from an NHS Trust that holds a sponsor licence");
-    nextSteps.push("Health and Care Worker visa: reduced application fee (£284) and no Immigration Health Surcharge");
+    nextSteps.push("Health and Care Worker visa: reduced application fees and exemption from the Immigration Health Surcharge (check current amounts on gov.uk)");
   }
   checks.push(visaCheck);
 
@@ -114,17 +136,24 @@ export function evaluateEligibility(input: EligibilityInput): EligibilityResult 
       action: "Please provide your medical school name and graduation year.",
     };
     nextSteps.push("Provide medical school details for degree assessment");
-  } else if (
-    UK_RIGHT_TO_WORK_COUNTRIES.some(c => nationalityLower.includes(c)) ||
-    GMC_EXEMPT_COUNTRIES.some(c => nationalityLower.includes(c) || (input.medicalSchool || "").toLowerCase().includes(c))
-  ) {
+  } else if ((input.gmcStatus || "").toLowerCase().includes("registered")) {
+    // Already GMC-registered means the degree has, by definition, already been
+    // verified - registration requires it. This is fact, not a nationality
+    // inference: it applies to a Cairo graduate with GMC registration exactly as
+    // to an Oxford one.
     degreeCheck = {
       category: "degree",
       title: "Medical Degree Recognition",
       status: "met",
-      detail: "Your primary medical qualification is from a GMC-recognised institution. No additional degree verification is required.",
+      detail: "Your qualification has already been accepted by the GMC as part of your registration. No further degree verification is required.",
     };
   } else if (input.internshipCompleted) {
+    // Deliberately no nationality-based exemption. The GMC does not recognise
+    // degrees by the holder's nationality, and the old "acceptable overseas
+    // qualification" route it once did has been closed for years. Telling a
+    // doctor "no verification required" on that basis could send them down the
+    // wrong path. Every overseas graduate's qualification is verified during GMC
+    // registration; we say exactly that, and point them at the authority.
     degreeCheck = {
       category: "degree",
       title: "Medical Degree Recognition",
@@ -198,20 +227,23 @@ export function evaluateEligibility(input: EligibilityInput): EligibilityResult 
       };
     }
   } else {
-    // Not registered, not in progress
-    const isExempt = GMC_EXEMPT_COUNTRIES.some(c => nationalityLower.includes(c));
+    // Not registered, not in progress. No nationality-based PLAB exemption -
+    // exemptions come from things like an accepted postgraduate qualification or
+    // specialist registration, which we do not assess here, not from where the
+    // doctor is from. We list PLAB as the default route and note the exemption
+    // exists, rather than deciding it for them.
     const hasIelts = ieltsLower && !ieltsLower.includes("not-taken") && ieltsLower !== "";
     const hasPlabBoth = plabLower.includes("both") || plabLower.includes("passed");
 
-    let requirements: string[] = [];
+    const requirements: string[] = [];
 
-    if (!isExempt && !hasPlabBoth) {
-      requirements.push("Pass PLAB 1 and PLAB 2 examinations (or obtain a PLAB exemption through specialist registration)");
+    if (!hasPlabBoth) {
+      requirements.push("Pass PLAB 1 and PLAB 2 (or hold an accepted postgraduate qualification that exempts you from PLAB)");
     }
     if (!hasIelts) {
       requirements.push("IELTS Academic (7.5 overall, 7.0 each band) or OET (B in all sub-tests)");
     }
-    requirements.push("Submit GMC application with certified documents, good standing certificate, and application fee (£439)");
+    requirements.push("Submit GMC application with certified documents, certificate of good standing, and the application fee");
 
     gmcCheck = {
       category: "gmc",
@@ -222,7 +254,7 @@ export function evaluateEligibility(input: EligibilityInput): EligibilityResult 
     };
 
     if (!hasIelts) nextSteps.push("Achieve required IELTS/OET scores for GMC registration");
-    if (!isExempt && !hasPlabBoth) nextSteps.push("Pass PLAB 1 and PLAB 2 examinations");
+    if (!hasPlabBoth) nextSteps.push("Pass PLAB 1 and PLAB 2 (unless exempt via a recognised qualification)");
     nextSteps.push("Apply for GMC registration with full documentation");
   }
   checks.push(gmcCheck);

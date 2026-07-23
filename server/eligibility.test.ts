@@ -63,7 +63,10 @@ describe("Eligibility Engine", () => {
     expect(result.checks.find(c => c.category === "degree")?.status).toBe("not-met");
   });
 
-  it("should exempt PLAB for Australian graduates", () => {
+  it("does not grant a degree exemption by nationality", () => {
+    // The GMC does not recognise degrees by where the doctor is from, so an
+    // overseas graduate's degree is always verified during registration - never
+    // waved through as "no verification required".
     const result = evaluateEligibility({
       nationality: "Australian",
       medicalSchool: "University of Melbourne",
@@ -72,6 +75,82 @@ describe("Eligibility Engine", () => {
       plabStatus: "",
       ieltsOetStatus: "achieved",
     });
-    expect(result.checks.find(c => c.category === "degree")?.status).toBe("met");
+    const degree = result.checks.find(c => c.category === "degree");
+    expect(degree?.status).not.toBe("met");
+    expect(degree?.detail.toLowerCase()).not.toContain("no additional degree verification");
+  });
+});
+
+describe("Eligibility Engine — country matching (regression)", () => {
+  // These used to be false positives from substring matching: "Russian"
+  // contains "us", "Ukraine" contains "uk".
+
+  it("does not treat a Russian national as having a GMC-exempt / recognised degree", () => {
+    const result = evaluateEligibility({
+      nationality: "Russian",
+      medicalSchool: "Moscow State University",
+      internshipCompleted: true,
+      gmcStatus: "",
+      ieltsOetStatus: "",
+    });
+    const degree = result.checks.find(c => c.category === "degree");
+    expect(degree?.detail.toLowerCase()).not.toContain("no additional degree verification");
+    // and must still require a visa
+    expect(result.checks.find(c => c.category === "visa")?.status).not.toBe("met");
+  });
+
+  it("does not treat a doctor living in Ukraine as having UK right to work", () => {
+    const result = evaluateEligibility({
+      nationality: "Ukrainian",
+      countryOfResidence: "Ukraine",
+      gmcStatus: "",
+    });
+    expect(result.checks.find(c => c.category === "visa")?.status).not.toBe("met");
+  });
+
+  it("does not treat a Belarusian national as GMC-exempt", () => {
+    const result = evaluateEligibility({
+      nationality: "Belarusian",
+      medicalSchool: "Belarusian State Medical University",
+      internshipCompleted: true,
+      gmcStatus: "",
+    });
+    expect(result.checks.find(c => c.category === "visa")?.status).not.toBe("met");
+  });
+});
+
+describe("Eligibility Engine — residence is not right to work (regression)", () => {
+  it("does NOT grant work authorisation just because the doctor lives in the UK", () => {
+    // Living in the UK on a visit or student visa is not a right to work.
+    // Treating it as one sends doctors to apply for jobs that will never sponsor them.
+    const result = evaluateEligibility({
+      nationality: "Egyptian",
+      countryOfResidence: "United Kingdom",
+      gmcStatus: "registered",
+      medicalSchool: "Cairo University",
+      internshipCompleted: true,
+    });
+    const visa = result.checks.find(c => c.category === "visa");
+    expect(visa?.status).not.toBe("met");
+  });
+
+  it("honours an explicit right-to-work answer over nationality", () => {
+    const result = evaluateEligibility({
+      nationality: "Egyptian",
+      ukRightToWork: true,
+      gmcStatus: "registered",
+      medicalSchool: "Cairo University",
+      internshipCompleted: true,
+    });
+    expect(result.checks.find(c => c.category === "visa")?.status).toBe("met");
+  });
+
+  it("still requires a visa for a non-UK national who has not claimed right to work", () => {
+    const result = evaluateEligibility({
+      nationality: "Indian",
+      countryOfResidence: "India",
+      gmcStatus: "registered",
+    });
+    expect(result.checks.find(c => c.category === "visa")?.status).toBe("partially-met");
   });
 });
