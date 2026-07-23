@@ -15,6 +15,7 @@ import {
 import { storagePut } from "../storage";
 import { evaluateEligibility } from "../eligibility";
 import { matchCriteria } from "../criteriaMatch";
+import { buildSupportingInfoDraft } from "../draftSupportingInfo";
 import { sendEmail } from "../email";
 import { ENV } from "../_core/env";
 
@@ -401,5 +402,58 @@ export const applicationsRouter = router({
           documentCategories: docs.map(d => d.category),
         }
       );
+    }),
+
+  /**
+   * Produces a first-draft supporting-information statement for a doctor against
+   * a specific post. Assembled only from the doctor's own recorded facts and the
+   * criteria that matched as "evidenced" - it never writes about a gap. Admin
+   * only, and the result carries a "review before use" disclaimer: it is a
+   * starting point for a consultant, not a finished document.
+   */
+  draftSupportingInfo: adminProcedure
+    .input(
+      z.object({
+        applicationId: z.number().int().positive(),
+        jobTitle: z.string().trim().min(1).max(255),
+        hospital: z.string().trim().max(255).optional(),
+        essentialCriteria: z.array(z.string().max(500)).max(50).default([]),
+        desirableCriteria: z.array(z.string().max(500)).max(50).default([]),
+      })
+    )
+    .query(async ({ input }) => {
+      const application = await applicationsRepo.findById(input.applicationId);
+      if (!application) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Application not found" });
+      }
+      const docs = await documentsRepo.listForApplication(application.id);
+      const match = matchCriteria(
+        { essentialCriteria: input.essentialCriteria, desirableCriteria: input.desirableCriteria },
+        {
+          gmcStatus: application.gmcStatus ?? undefined,
+          plabStatus: application.plabStatus ?? undefined,
+          ieltsOetStatus: application.ieltsOetStatus ?? undefined,
+          alsBlsStatus: application.alsBlsStatus ?? undefined,
+          yearsExperience: application.yearsExperience ?? undefined,
+          specialtyInterest: application.specialtyInterest ?? undefined,
+          currentRole: application.currentRole ?? undefined,
+          careerStory: application.careerStory ?? undefined,
+          internshipCompleted: application.internshipCompleted,
+          nhsExperience: application.nhsExperience,
+          documentCategories: docs.map(d => d.category),
+        }
+      );
+      return buildSupportingInfoDraft({
+        jobTitle: input.jobTitle,
+        hospital: input.hospital,
+        profile: {
+          fullName: application.fullName,
+          currentRole: application.currentRole ?? undefined,
+          specialtyInterest: application.specialtyInterest ?? undefined,
+          yearsExperience: application.yearsExperience ?? undefined,
+          careerStory: application.careerStory ?? undefined,
+        },
+        match,
+      });
     }),
 });
