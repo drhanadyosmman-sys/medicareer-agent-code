@@ -14,6 +14,7 @@ import {
 } from "../repos";
 import { storagePut } from "../storage";
 import { evaluateEligibility } from "../eligibility";
+import { matchCriteria } from "../criteriaMatch";
 import { sendEmail } from "../email";
 import { ENV } from "../_core/env";
 
@@ -354,5 +355,51 @@ export const applicationsRouter = router({
         nhsExperience: application.nhsExperience,
         previousUkApplications: application.previousUkApplications,
       });
+    }),
+
+  /* ─────────────────────────────── Job criteria matching ──────────────────── */
+
+  /**
+   * Matches one doctor's application against a job's person specification,
+   * criterion by criterion. Returns which criteria are evidenced by real profile
+   * data, which are gaps, and which need a human to judge. Admin-only: this is a
+   * consultant's working tool.
+   *
+   * The criteria are passed in (the admin has them in front of them when
+   * assessing a job), so this does not depend on where the job records live.
+   */
+  matchToJob: adminProcedure
+    .input(
+      z.object({
+        applicationId: z.number().int().positive(),
+        essentialCriteria: z.array(z.string().max(500)).max(50).default([]),
+        desirableCriteria: z.array(z.string().max(500)).max(50).default([]),
+      })
+    )
+    .query(async ({ input }) => {
+      const application = await applicationsRepo.findById(input.applicationId);
+      if (!application) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Application not found" });
+      }
+      const docs = await documentsRepo.listForApplication(application.id);
+      return matchCriteria(
+        {
+          essentialCriteria: input.essentialCriteria,
+          desirableCriteria: input.desirableCriteria,
+        },
+        {
+          gmcStatus: application.gmcStatus ?? undefined,
+          plabStatus: application.plabStatus ?? undefined,
+          ieltsOetStatus: application.ieltsOetStatus ?? undefined,
+          alsBlsStatus: application.alsBlsStatus ?? undefined,
+          yearsExperience: application.yearsExperience ?? undefined,
+          specialtyInterest: application.specialtyInterest ?? undefined,
+          currentRole: application.currentRole ?? undefined,
+          careerStory: application.careerStory ?? undefined,
+          internshipCompleted: application.internshipCompleted,
+          nhsExperience: application.nhsExperience,
+          documentCategories: docs.map(d => d.category),
+        }
+      );
     }),
 });
