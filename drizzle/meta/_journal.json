@@ -1,27 +1,34 @@
 {
-    "version":  "7",
-    "dialect":  "mysql",
-    "entries":  [
-                    {
-                        "idx":  0,
-                        "version":  "5",
-                        "when":  1781642005144,
-                        "tag":  "0000_sturdy_stick",
-                        "breakpoints":  true
-                    },
-                    {
-                        "idx":  1,
-                        "version":  "5",
-                        "when":  1784454561685,
-                        "tag":  "0001_purple_magdalene",
-                        "breakpoints":  true
-                    },
-                    {
-                        "idx":  2,
-                        "version":  "5",
-                        "when":  1784524789606,
-                        "tag":  "0002_lively_madame_hydra",
-                        "breakpoints":  true
-                    }
-                ]
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1781642005144,
+      "tag": "0000_sturdy_stick",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1784454561685,
+      "tag": "0001_purple_magdalene",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1784524789606,
+      "tag": "0002_lively_madame_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1784801879281,
+      "tag": "0003_nervous_speed",
+      "breakpoints": true
+    }
+  ]
 }

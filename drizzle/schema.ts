@@ -96,6 +96,9 @@ export const applications = mysqlTable(
     plabStatus: varchar("plabStatus", { length: 120 }),
     ieltsOetStatus: varchar("ieltsOetStatus", { length: 120 }),
     alsBlsStatus: varchar("alsBlsStatus", { length: 120 }),
+    // Nullable on purpose: null means "not answered", which the eligibility
+    // engine treats differently from an explicit "no".
+    ukRightToWork: boolean("ukRightToWork"),
     nhsExperience: boolean("nhsExperience").default(false).notNull(),
     previousUkApplications: boolean("previousUkApplications").default(false).notNull(),
     previousInterviews: boolean("previousInterviews").default(false).notNull(),

@@ -70,7 +70,7 @@ export default function Apply() {
   const [form, setForm] = useState({
     fullName: '', email: '', whatsapp: '', countryOfResidence: '', nationality: '', preferredPathway: 'uk-nhs-jobs', preferredLanguage: 'en',
     medicalSchool: '', graduationYear: '', internshipCompleted: '', yearsExperience: '', currentRole: '', specialtyInterest: '', currentCountryOfPractice: '',
-    gmcStatus: '', plabStatus: '', ieltsOetStatus: '', alsBlsStatus: '', nhsExperience: '', previousUkApplications: '', previousInterviews: '',
+    gmcStatus: '', plabStatus: '', ieltsOetStatus: '', alsBlsStatus: '', ukRightToWork: '', nhsExperience: '', previousUkApplications: '', previousInterviews: '',
     careerStory: '', storyType: 'written',
     consent1: false, consent2: false, consent3: false, consent4: false,
   });
@@ -203,6 +203,9 @@ export default function Apply() {
         plabStatus: form.plabStatus || undefined,
         ieltsOetStatus: form.ieltsOetStatus || undefined,
         alsBlsStatus: form.alsBlsStatus || undefined,
+        // Tri-state: only send a boolean once the doctor has actually answered,
+        // so "unanswered" stays distinct from "no" in the eligibility engine.
+        ukRightToWork: form.ukRightToWork === '' ? undefined : form.ukRightToWork === 'yes',
         nhsExperience: form.nhsExperience === 'yes',
         previousUkApplications: form.previousUkApplications === 'yes',
         previousInterviews: form.previousInterviews === 'yes',
@@ -262,6 +265,7 @@ export default function Apply() {
     else if (form.plabStatus === 'plab1-passed') score += 8;
     if (form.ieltsOetStatus !== '' && form.ieltsOetStatus !== 'not-taken') score += 15;
     if (form.internshipCompleted === 'yes') score += 5;
+    if (form.ukRightToWork === 'yes') score += 5;
     if (parseInt(form.yearsExperience) >= 3) score += 10;
     if (uploadedFiles.length >= 3) score += 5;
     return Math.min(score, 100);
@@ -486,6 +490,18 @@ export default function Apply() {
                         <SelectItem value="none">{t('apply.none')}</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label>{t('apply.ukRightToWork')}</Label>
+                    <Select value={form.ukRightToWork} onValueChange={v => updateForm('ukRightToWork', v)}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder={lang === 'ar' ? 'اختر...' : 'Select...'} /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">{t('apply.rtwYes')}</SelectItem>
+                        <SelectItem value="no">{t('apply.rtwNo')}</SelectItem>
+                        <SelectItem value="unsure">{t('apply.rtwUnsure')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">{t('apply.ukRightToWorkHint')}</p>
                   </div>
                   <div>
                     <Label>{t('apply.nhsExperience')}</Label>

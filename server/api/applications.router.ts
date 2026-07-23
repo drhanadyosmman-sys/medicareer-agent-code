@@ -37,6 +37,7 @@ const applicationInput = z.object({
   plabStatus: z.string().trim().max(120).optional(),
   ieltsOetStatus: z.string().trim().max(120).optional(),
   alsBlsStatus: z.string().trim().max(120).optional(),
+  ukRightToWork: z.boolean().optional(),
   nhsExperience: z.boolean().default(false),
   previousUkApplications: z.boolean().default(false),
   previousInterviews: z.boolean().default(false),
@@ -349,6 +350,7 @@ export const applicationsRouter = router({
         yearsExperience: application.yearsExperience ?? undefined,
         specialtyInterest: application.specialtyInterest ?? undefined,
         internshipCompleted: application.internshipCompleted,
+        ukRightToWork: application.ukRightToWork ?? undefined,
         nhsExperience: application.nhsExperience,
         previousUkApplications: application.previousUkApplications,
       });
